@@ -162,14 +162,14 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     const userId = req.userId
-    await Session.deleteMany({ userId })
-    await User.findByIdAndUpdate(userId, { isLoggedIn: false })
-    await Session.deleteMany({ userId })
+    // await Session.deleteMany({ userId })
+    // await User.findByIdAndUpdate(userId, { isLoggedIn: false })
     await User.findByIdAndUpdate(
       userId,
       { isLoggedIn: false },
       { new: true }
     )
+    await Session.deleteMany({ userId })
     return res.status(200).json({
       success: true,
       message: "User logged out succesfully"
