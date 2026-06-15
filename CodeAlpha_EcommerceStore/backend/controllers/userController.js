@@ -51,9 +51,9 @@ export const verify = async (req, res) => {
   try {
     const authHeader = req.headers.authorization
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
-        message: 'Authorization token is missing or invalid'
+        message: 'Authorization token ismissing or invalid'
       })
     }
     const token = authHeader.split(" ")[1] //[Bearer, f86ftv7fv97d8s7]
@@ -70,7 +70,7 @@ export const verify = async (req, res) => {
     if (!user) {
       return res.status(400).json({ success: false, message: "User not found!" })
     }
-    // Do not clear `user.token` here — keep the registration token stored if needed.
+    user.token = token;
     user.isVerified = true;
     await user.save()
     return res.status(200).json({ success: true, message: "Email verified successfully" })
