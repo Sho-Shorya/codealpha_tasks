@@ -162,8 +162,8 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     const userId = req.userId
-    // await Session.deleteMany({ userId })
-    // await User.findByIdAndUpdate(userId, { isLoggedIn: false })
+    await Session.deleteMany({ userId })
+    await User.findByIdAndUpdate(userId, { isLoggedIn: false })
     await Session.deleteMany({ userId })
     await User.findByIdAndUpdate(
       userId,
