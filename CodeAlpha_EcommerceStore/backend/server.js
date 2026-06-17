@@ -3,6 +3,7 @@ import 'dotenv/config'
 import { connectDb } from "./database/db.js";
 import userRoute from "./routes/userRoute.js"
 import productRoute from "./routes/productRoute.js"
+import debugRoute from "./routes/debugRoute.js"
 import cors from 'cors'
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors())
 
 app.use('/api/v1/user', userRoute)
 app.use('/api/v1/product', productRoute)
+app.use('/debug', debugRoute)
 
 
 // http://localhost:8000/api/v1/user/register
