@@ -48,7 +48,9 @@ const Signup = () => {
       if(res.data.success){
         navigate('/verify')
         toast.success(res.data.message);
-      }
+      }else(
+        console.log("Registration failed")
+      )
     } catch (error) {
       toast.error(error.response?.data?.message);
 
