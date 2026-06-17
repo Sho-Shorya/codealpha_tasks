@@ -30,13 +30,12 @@ export const register = async (req, res) => {
       password: hashedPassword
     })
     const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' })
-    // send verification email (don't fail registration if email sending fails)
-    try {
-      const sent = await verifyEmail(token, email)
-      if (!sent) console.warn('Registration: verification email not sent')
-    } catch (e) {
-      console.warn('Registration: verifyEmail failed', e.message || e)
-    }
+    // send verification email asynchronously so registration is fast
+    verifyEmail(token, email)
+      .then((sent) => {
+        if (!sent) console.warn('Registration: verification email not sent')
+      })
+      .catch((e) => console.warn('Registration: verifyEmail failed', e?.message || e))
     newUser.token = token
     await newUser.save()
     return res.status(201).json({
@@ -93,12 +92,12 @@ export const reVerify = async (req, res) => {
       return res.status(400).json({ success: false, message: "User not found!" })
     }
     const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '10m' })
-    try {
-      const sent = await verifyEmail(token, email)
-      if (!sent) console.warn('Re-verify: verification email not sent')
-    } catch (e) {
-      console.warn('Re-verify: verifyEmail failed', e.message || e)
-    }
+    // send re-verification email asynchronously
+    verifyEmail(token, email)
+      .then((sent) => {
+        if (!sent) console.warn('Re-verify: verification email not sent')
+      })
+      .catch((e) => console.warn('Re-verify: verifyEmail failed', e?.message || e))
     user.token = token
     await user.save()
     return res.status(200).json({
