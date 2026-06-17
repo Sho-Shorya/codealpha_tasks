@@ -1,7 +1,6 @@
 import { User } from "../models/userModel.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
-import { verifyEmail } from "../emailVerify/verifyEmail.js";
 import { Session } from "../models/sessionMedel.js";
 import { sendOptMail } from "../emailVerify/sendOptMail.js";
 import cloudinary from "../utils/cloudinary.js";
@@ -52,66 +51,9 @@ export const register = async (req, res) => {
   }
 }
 
-// export const verify = async (req, res) => {
-//   try {
-//     const authHeader = req.headers.authorization
-//     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-//       res.status(400).json({
-//         success: false,
-//         message: 'Authorization token ismissing or invalid'
-//       })
-//     }
-//     const token = authHeader.split(" ")[1] //[Bearer, f86ftv7fv97d8s7]
-//     let decoded
-//     try {
-//       decoded = jwt.verify(token, process.env.SECRET_KEY) //will store ID of token (user._id)
-//     } catch (error) {
-//       if (error.name === "TokenExpiredError") {
-//         return res.status(400).json({ success: false, message: "The registration token has expired" })
-//       }
-//       return res.status(400).json({ success: false, message: "Token verification failed!" })
-//     }
-//     const user = await User.findById(decoded.id)
-//     if (!user) {
-//       return res.status(400).json({ success: false, message: "User not found!" })
-//     }
-//     user.token = authHeader.split(" ")[1];
-//     user.isVerified = true;
-//     await user.save()
-//     return res.status(200).json({ success: true, message: "Email verified successfully" })
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message })
-//   }
-// }
-
-// export const reVerify = async (req, res) => {
-//   try {
-//     const { email } = req.body;
-//     const user = await User.findOne({ email })
-//     if (!user) {
-//       return res.status(400).json({ success: false, message: "User not found!" })
-//     }
-//     const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '10m' })
-//     // send re-verification email asynchronously
-//     verifyEmail(token, email)
-//       .then((sent) => {
-//         if (!sent) console.warn('Re-verify: verification email not sent')
-//       })
-//       .catch((e) => console.warn('Re-verify: verifyEmail failed', e?.message || e))
-//     user.token = token
-//     await user.save()
-//     return res.status(200).json({
-//       success: true,
-//       message: "Verification email sent again successfully",
-//       token: user.token
-//     })
-//   } catch (error) {
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message
-//     })
-//   }
-// }
+// Note: verify and reVerify flows were intentionally removed for this deployment.
+// Signup (register) and login remain active. Email verification-related code
+// was removed to simplify deployment where immediate login is required.
 
 export const login = async (req, res) => {
   try {
