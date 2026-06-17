@@ -12,9 +12,10 @@ const VerifyEmail = () => {
 
   const verifyEmail = useCallback(async () => {
     try {
+      const rawToken = token ? decodeURIComponent(token) : token
       const res = await axios.post(`${API_BASE_URL}/api/v1/user/verify`, {}, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${rawToken}`
         }
       })
       if (res.data.success) {

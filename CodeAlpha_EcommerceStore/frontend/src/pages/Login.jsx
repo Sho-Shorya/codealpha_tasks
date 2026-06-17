@@ -21,7 +21,7 @@ import { toast } from "sonner"
 import { API_BASE_URL } from '@/lib/constants'
 
 const Login = () => {
-    const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
@@ -42,12 +42,12 @@ const Login = () => {
     e.preventDefault()
     try {
       setLoading(true)
-      const res = await axios.post(`${API_BASE_URL}/api/v1/user/login`, formData,{
-        headers:{
+      const res = await axios.post(`${API_BASE_URL}/api/v1/user/login`, formData, {
+        headers: {
           "Content-Type": "application/json"
         }
       })
-      if(res.data.success){
+      if (res.data.success) {
         navigate('/')
         dispatch(setUser(res.data.user))
         localStorage.setItem('user', JSON.stringify(res.data.user))
@@ -56,49 +56,24 @@ const Login = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message);
+      navigate('/verify')
 
-    } finally{
+    } finally {
       setLoading(false)
     }
 
   }
   return (
-        <div className='flex justify-center items-center min-h-screen bg-emerald-100'>
+    <div className='flex justify-center items-center min-h-screen bg-emerald-100'>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Create to your account</CardTitle>
+          <CardTitle>Login to your account</CardTitle>
           <CardDescription>
             Enter given details below.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-3">
-            {/* <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="firstName">First name</Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  placeholder="john"
-                  required
-                  value={formData.firstName}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="lastName">Last name</Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  placeholder="doe"
-                  required
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
-              </div>
-            </div> */}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -133,7 +108,7 @@ const Login = () => {
         <CardFooter className="flex-col gap-2">
           <Button onClick={submitHander} type="submit" className="w-full cursor-pointer bg-emerald-800 hover:bg-emerald-600">
             {
-              loading ? <><Loader2 className="h-4 w-4 animate:spin mr-2"/>Please wait</> : "login"
+              loading ? <><Loader2 className="h-4 w-4 animate:spin mr-2" />Please wait</> : "login"
             }
           </Button>
           <p className="text-gray-700 text-sm">Don't have an account? <Link to={'/signup'} className="hover:underline cursor-pointer text-emerald-800 ">Signup</Link></p>
