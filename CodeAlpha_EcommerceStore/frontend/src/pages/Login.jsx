@@ -56,7 +56,6 @@ const Login = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message);
-      navigate('/verify')
 
     } finally {
       setLoading(false)

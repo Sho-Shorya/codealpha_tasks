@@ -4,14 +4,17 @@ import dns from "dns"
 
 const SMTP_HOST = 'smtp.gmail.com'
 
+const MAIL_USER = process.env.MAIL_USER?.trim()
+const MAIL_PASS = process.env.MAIL_PASS?.replace(/\s+/g, '')
+
 const makeTransport = (host) => nodemailer.createTransport({
   host,
   port: 587,
   secure: false,
   requireTLS: true,
   auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
+    user: MAIL_USER,
+    pass: MAIL_PASS,
   },
   tls: {
     servername: SMTP_HOST,
@@ -24,7 +27,7 @@ export const verifyEmail = async (token, email) => {
   const verifyUrl = `${process.env.FRONTEND_URL.replace(/\/$/, '')}/verify/${safeToken}`
 
   const mailConfigurations = {
-    from: process.env.MAIL_USER,
+    from: MAIL_USER,
     to: email,
     subject: 'Email Verification',
     text: `Hi!\nPlease follow the given link to verify your email:\n${verifyUrl}\n\nThanks`,
