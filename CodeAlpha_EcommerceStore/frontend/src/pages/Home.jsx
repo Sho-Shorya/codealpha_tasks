@@ -1,7 +1,7 @@
 import Features from '@/components/Features'
 import Hero from '@/components/Hero'
 import React from 'react'
-import ProductsList from '@/components/products-list'
+import ProductsList from '@/components/Products-list'
 import { useSelector } from 'react-redux'
 
 const Home = () => {
