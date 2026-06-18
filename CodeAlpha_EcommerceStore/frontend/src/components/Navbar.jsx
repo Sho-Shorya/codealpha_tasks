@@ -1,5 +1,5 @@
-import { ShoppingCart } from 'lucide-react'
-import React, { useState } from 'react'
+import { ShoppingCart, Loader2, Search, User, Menu, X, ChevronDown } from 'lucide-react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,14 +9,20 @@ import { toast } from 'sonner'
 import { API_BASE_URL } from '@/lib/constants'
 
 const Navbar = () => {
-  const { user } = useSelector(store => store.user)
-  const accessToken = localStorage.getItem('accessToken')
+  const { user } = useSelector((store) => store.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
   const [slideBar, setSlideBar] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [cartCount, setCartCount] = useState(0)
+  const [search, setSearch] = useState('')
+  const [badgePulse, setBadgePulse] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const userMenuRef = useRef(null)
 
   // hydrate redux user from localStorage if needed
-  React.useEffect(() => {
+  useEffect(() => {
     if (!user) {
       const raw = localStorage.getItem('user')
       if (raw) {
@@ -30,100 +36,251 @@ const Navbar = () => {
     }
   }, [user, dispatch])
 
+  // read cart from localStorage (simple fallback if no redux cart yet)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('cart')
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        setCartCount(Array.isArray(parsed) ? parsed.length : 0)
+      } else {
+        setCartCount(0)
+      }
+    } catch (e) {
+      setCartCount(0)
+    }
+  }, [])
+
+  // update cart count when other tabs change localStorage 'cart'
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === 'cart') {
+        try {
+          const parsed = JSON.parse(e.newValue)
+          const newCount = Array.isArray(parsed) ? parsed.length : 0
+          if (newCount !== cartCount) {
+            setCartCount(newCount)
+            setBadgePulse(true)
+            setTimeout(() => setBadgePulse(false), 400)
+          }
+        } catch (err) {
+          setCartCount(0)
+        }
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [cartCount])
+
+  // close user menu on outside click or Escape
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (showUserMenu && userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setShowUserMenu(false)
+      }
+    }
+    const onKey = (e) => {
+      if (e.key === 'Escape') setShowUserMenu(false)
+    }
+    document.addEventListener('click', onDocClick)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('click', onDocClick)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [showUserMenu])
+
   const logoutHandler = async () => {
+    setLoading(true)
+    const token = localStorage.getItem('accessToken')
+    if (!token) {
+      // no token — just clear local state
+      dispatch(setUser(null))
+      localStorage.removeItem('user')
+      localStorage.removeItem('accessToken')
+      setLoading(false)
+      navigate('/login')
+      return
+    }
+
     try {
       const res = await axios.post(
         `${API_BASE_URL}/api/v1/user/logout`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       )
-      if (res.data.success) {
-        toast.success(res.data.message)
+      if (res.data && res.data.success) {
+        toast.success(res.data.message || 'Logged out')
         dispatch(setUser(null))
         localStorage.removeItem('user')
         localStorage.removeItem('accessToken')
-        return navigate('/login')
+        navigate('/login')
+      } else {
+        // server didn't accept logout — keep client state but notify
+        toast.error(res.data?.message || 'Logout failed on server')
       }
     } catch (err) {
-      toast.error('Logout failed')
+      const status = err?.response?.status
+      if (status === 401 || status === 403) {
+        // token invalid/expired — clear client anyway
+        dispatch(setUser(null))
+        localStorage.removeItem('user')
+        localStorage.removeItem('accessToken')
+        navigate('/login')
+      } else {
+        // network/server error — don't wipe local state
+        console.warn('Logout request failed', err?.message || err)
+        toast.error('Logout failed — please try again')
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
+  const onSearchSubmit = (e) => {
+    e.preventDefault()
+    if (!search) return navigate('/products')
+    navigate(`/products?search=${encodeURIComponent(search)}`)
+  }
+
+  const displayName = (() => {
+    if (!user) return ''
+    const fn = user.firstName || ''
+    const ln = user.lastName || ''
+    const name = `${fn} ${ln}`.trim()
+    if (name) return name
+    if (user.email) return user.email.split('@')[0]
+    return 'User'
+  })()
+
+  const avatarInitial = (() => {
+    const ch = user?.firstName?.[0] || user?.lastName?.[0] || 'U'
+    return String(ch).toUpperCase()
+  })()
+
   return (
-    <header className="lg:bg-emerald-50 fixed top-0 lg:w-screen z-20 border-b border-emerald-200 bg-emerald-50 w-screen lg:h-[auto] h-[70px] flex items-center">
-      <div className="lg:max-w-6xl lg:mx-auto lg:flex lg:flex:col lg:justify-between lg:items-center lg:py-3 flex flex-row w-[100%] justify-center items-center">
-        {/* Logo section */}
-        <Link to="/">
-          <div className="flex gap-2 items-center">
-            <img src="/Ekart1.png" className="lg:h-12 h-7" alt="logo" />
-            <a href="/" className="text-3xl text-gray-700">
-              Ekart
-            </a>
+    <header className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      <div className="max-w-6xl mx-auto px-4 lg:px-6">
+        <div className="flex items-center justify-between h-16">
+          {/* Left: logo + mobile hamburger */}
+          <div className="flex items-center gap-4">
+            <button className="lg:hidden p-2 text-gray-700 hover:text-emerald-600" aria-label="Open menu" onClick={() => setSlideBar(true)}>
+              <Menu className="h-6 w-6" />
+            </button>
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/Ekart1.png" className="h-10" alt="logo" />
+              <span className="text-2xl font-bold text-emerald-700">Ekart</span>
+            </Link>
           </div>
-        </Link>
-        <img
-          src="more.png"
-          onClick={() => setSlideBar(!slideBar)}
-          className="absolute lg:relative lg:hidden h-5 right-7 opacity-[70%]"
-          alt="more"
-        />
 
-        {/* Large-screen login/logout buttons */}
-        <div className="hidden lg:flex lg:items-center lg:mx-20 lg:gap-4">
-            <Button onClick={() => navigate('/signup')} className="bg-gray cursor-pointer px-10 py-5 hover:bg-gray-200 font-bold text-black">Sign Up</Button>
-          {user ? (
-            <Button onClick={logoutHandler} className="bg-emerald-600 cursor-pointer text-white hover:bg-emerald-500">Logout</Button>
-          ) : (
-            <Button onClick={() => navigate('/login')} className="bg-gradient-to-tl cursor-pointer px-10 py-5 from-blue-600 to-purple-600 text-white hover:bg-gradient-to-bl">Login</Button>
-          )}
-        </div>
+          {/* Center: nav links + search (hidden on small) */}
+          <div className="hidden lg:flex lg:items-center lg:gap-8">
+            <nav className="flex items-center gap-6 text-sm text-gray-700">
+              <Link to="/products" className="hover:text-emerald-600">Products</Link>
+              <Link to="/categories" className="hover:text-emerald-600">Categories</Link>
+              <Link to="/offers" className="hover:text-emerald-600">Offers</Link>
+            </nav>
+            <form onSubmit={onSearchSubmit} className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded shadow-sm">
+              <Search className="text-gray-400" />
+              <input aria-label="Search products" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products, brands..." className="w-64 bg-transparent px-2 py-2 text-sm placeholder:text-gray-400 focus:outline-none" />
+              <Button type="submit" className="px-3 py-1 text-sm">Search</Button>
+            </form>
+          </div>
 
-        <div
-          className={`fixed top-0 right-0 h-screen w-[80%] bg-red-50 transition-transform duration-300 ease-in-out ${
-            slideBar ? 'translate-x-0' : 'translate-x-full'
-          }`}>
-          <div>
-            <img
-              src="close.png"
-              onClick={() => setSlideBar(!slideBar)}
-              className="absolute lg:hidden top-3 right-3 h-7 bg-gray-300 opacity-[70%]"
-              alt="close"
-            />
-            <ul className="flex flex-col gap-7 mt-20 items-center text-sm font-semibold px-6">
-              <Link to="/" className="text-2xl">
-                <li>Home</li>
-              </Link>
-              <Link to="/products" className="text-2xl">
-                <li>Products</li>
-              </Link>
-              {user && (
-                <Link to={`/profile/${user._id}`}>
-                  <li>Hello, {user.firstName}</li>
-                </Link>
-              )}
-              <Link to="/cart">
-                <div className="relative inline-block">
-                  <ShoppingCart className="text-2xl" />
-                  <span className="absolute -top-3 -right-3 bg-emerald-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                    0
-                  </span>
+          {/* Right: cart + auth */}
+          <div className="flex items-center gap-4">
+            <Link to="/cart" className="relative p-2" aria-label={`Cart with ${cartCount} items`} title="View cart">
+              <ShoppingCart className="text-2xl text-gray-700" />
+              <span className={`absolute -top-2 -right-2 bg-emerald-600 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center transform ${badgePulse ? 'scale-110' : 'scale-100'} transition-transform`}>{cartCount}</span>
+            </Link>
+
+            {user ? (
+              <div className="relative" ref={userMenuRef}>
+                <button id="user-menu-button" onClick={() => setShowUserMenu((s) => !s)} className="flex items-center gap-2 px-2 py-1 rounded-full bg-white hover:shadow-sm focus:shadow-outline focus:outline-none" aria-haspopup="true" aria-expanded={showUserMenu} aria-controls="user-menu">
+                  <div className="relative flex items-center">
+                    {user?.profilePicUrl ? (
+                      <img src={user.profilePicUrl} alt="avatar" className="h-9 w-9 rounded-full object-cover ring-2 ring-emerald-50 shadow-sm" />
+                    ) : (
+                      <div className="h-9 w-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-medium ring-2 ring-emerald-50 shadow-sm">{avatarInitial}</div>
+                    )}
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                </button>
+                {showUserMenu && (
+                  <div id="user-menu" className="absolute right-0 mt-2 w-64 bg-white border shadow-lg z-40 rounded-md ring-1 ring-black ring-opacity-5 transform transition ease-out duration-150" role="menu" aria-labelledby="user-menu-button">
+                    <div className="absolute right-4 -top-3 w-3 h-3 bg-white rotate-45 border-l border-t border-gray-100" aria-hidden="true" />
+                    <div className="px-4 py-3 border-b">
+                      <div className="flex items-center gap-3">
+                        {user?.profilePicUrl ? (
+                          <img src={user.profilePicUrl} alt="avatar" className="max-h-10 w-10 rounded-full object-cover" />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-medium">{avatarInitial}</div>
+                        )}
+                        <div>
+                          <div className="font-medium text-lg">{user.firstName}</div>
+                          <div className="text-xs text-gray-500">{user.email}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <nav className="py-1" aria-label="User options">
+                      <Link to={`/profile/${user._id}`} className="text-[20px] flex items-center gap-3 px-4 py-2 hover:bg-emerald-50" role="menuitem">Profile</Link>
+                      <Link to="/orders" className="text-[20px] flex items-center gap-3 px-4 py-2 hover:bg-emerald-50" role="menuitem">Orders</Link>
+                      <Link to="/settings" className="text-[20px] flex items-center gap-3 px-4 py-2 hover:bg-emerald-50" role="menuitem">Settings</Link>
+                    </nav>
+                    <div className="px-4 py-3">
+                      <button onClick={logoutHandler} disabled={loading} className="text-[20px] w-full text-left px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded">{loading ? 'Logging out...' : 'Logout'}</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="hidden lg:flex items-center gap-2">
+                  <Button onClick={() => navigate('/signup')} className="px-3 py-2 border text-sm">Sign Up</Button>
+                  <Button onClick={() => navigate('/login')} className="bg-gradient-to-tl from-blue-600 to-purple-600 text-white px-3 py-2 text-sm">Login</Button>
                 </div>
-              </Link>
+            )}
+          </div>
+        </div>
+      </div>
 
-              {user ? (
-                <Button onClick={logoutHandler} className="m-5 absolute bottom-5 h-[60px] left-0 right-0 bg-emerald-600 text-white cursor-pointer hover:bg-emerald-500">
-                  Logout
-                </Button>
-              ) : (
-                <Button onClick={() => navigate('/login')} className="m-5 absolute bottom-5 h-[60px] left-0 right-0 bg-gradient-to-tl from-blue-600 to-purple-600 text-white cursor-pointer hover:bg-emerald-500">
-                  Login
-                </Button>
-              )}
-            </ul>
+      {/* Overlay for mobile panel */}
+      {slideBar && <div onClick={() => setSlideBar(false)} className="fixed inset-0 bg-black/40 z-40" />}
+
+      {/* Mobile slide panel */}
+      <div className={`fixed top-0 right-0 h-screen w-[80%] bg-white transition-transform duration-300 ease-in-out ${slideBar ? 'translate-x-0' : 'translate-x-full'} z-50`}>
+        <div className="p-4">
+          <div className="flex justify-between items-center">
+            <Link to="/" onClick={() => setSlideBar(false)} className="flex items-center gap-3">
+              <img src="/Ekart1.png" className="h-8" alt="logo" />
+              <span className="font-bold text-lg">Ekart</span>
+            </Link>
+            <button onClick={() => setSlideBar(false)} aria-label="Close menu" className="text-gray-700 hover:text-emerald-600">
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-4">
+            <Link to="/products" onClick={() => setSlideBar(false)} className="text-lg">Products</Link>
+            <Link to="/categories" onClick={() => setSlideBar(false)} className="text-lg">Categories</Link>
+            <Link to="/offers" onClick={() => setSlideBar(false)} className="text-lg">Offers</Link>
+            <form onSubmit={(e) => { onSearchSubmit(e); setSlideBar(false); }} className="flex gap-2">
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="flex-1 px-3 py-2 rounded border" />
+              <Button type="submit">Go</Button>
+            </form>
+            <Link to="/cart" onClick={() => setSlideBar(false)} className="flex items-center gap-2">Cart <span className="ml-2 inline-block bg-emerald-500 text-white rounded-full w-6 h-6 text-center">{cartCount}</span></Link>
+
+            {user ? (
+              <>
+                <Link to={`/profile/${user._id}`} onClick={() => setSlideBar(false)}>Profile</Link>
+                <Link to="/orders" onClick={() => setSlideBar(false)}>Orders</Link>
+                <Button onClick={logoutHandler} disabled={loading} className="mt-4">{loading ? 'Logging out...' : 'Logout'}</Button>
+              </>
+            ) : (
+              <div className="flex gap-2 mt-4">
+                <Button onClick={() => { setSlideBar(false); navigate('/signup') }} className="flex-1">Sign Up</Button>
+                <Button onClick={() => { setSlideBar(false); navigate('/login') }} className="flex-1">Login</Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

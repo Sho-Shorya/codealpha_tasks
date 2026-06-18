@@ -1,12 +1,11 @@
 import { Headphones, Shield, Truck } from "lucide-react";
 import React from "react";
 
-
 const Features = () => {
   return (
     <section className="py-12 bg-muted/50">
-      <div className="w-screen mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8 text-[25px]">
+      <div className="w-screen mx-40 px-4">
+        <div className="grid md:grid-cols-3 text-[25px]">
 
           {/* Feature 1 */}
           <div className="flex items-center space-x-4">

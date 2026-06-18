@@ -1,12 +1,22 @@
 import Features from '@/components/Features'
 import Hero from '@/components/Hero'
 import React from 'react'
+import ProductsList from '@/components/products-list'
+import { useSelector } from 'react-redux'
 
 const Home = () => {
+  const user = useSelector((state) => state.user?.user || null)
   return (
     <div className='w-screen overflow-hidden'>
-      <Hero/>
-      <Features/>
+      {user ? (
+        <>
+          <ProductsList />
+        </>
+      ) : (
+        <>
+          <Hero />
+          <Features /></>
+      )}
     </div>
   )
 }
