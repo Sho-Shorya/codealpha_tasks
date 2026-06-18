@@ -176,7 +176,7 @@ const Navbar = () => {
           {/* Center: nav links + search (hidden on small) */}
           <div className="hidden lg:flex lg:items-center lg:gap-8">
             <nav className="flex items-center gap-6 text-sm text-gray-700">
-              <Link to="/products" className="hover:text-emerald-600">Products</Link>
+              <Link to="/" className="hover:text-emerald-600">Products</Link>
               <Link to="/categories" className="hover:text-emerald-600">Categories</Link>
               <Link to="/offers" className="hover:text-emerald-600">Offers</Link>
             </nav>

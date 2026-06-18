@@ -2,29 +2,29 @@ import { Product } from "../models/productModel.js";
 import cloudinary from "../utils/cloudinary.js";
 import getDataUri from "../utils/dataUri.js";
 
-export const addProduct = async(req,res)=>{
+export const addProduct = async (req, res) => {
   try {
-    const {productName,productDesc,productPrice,catagory,brand} = req.body;
+    const { productName, productDesc, productPrice, catagory, brand } = req.body;
     const userId = req.id;
-    if(!productName || !productDesc || !productPrice || !catagory || !brand){
+    if (!productName || !productDesc || !productPrice || !catagory || !brand) {
       return res.status(400).json({
-      success:false,message:"All feids are required!"
-    })
+        success: false, message: "All feids are required!"
+      })
     }
-    const productImg = [];
-    if(req.files && req.files.length > 0){
+    let productImg = [];
+    if (req.files && req.files.length > 0) {
       for (let file of req.files) {
         const fileUri = getDataUri(file)
         const result = await cloudinary.uploader.upload(fileUri, {
-          folder:"mern_products"
+          folder: "mern_products"
         })
         productImg.push({
           url: result.secure_url,
-          public_id: result.public_id  
+          public_id: result.public_id
         })
       }
     }
-    
+
     //create a product in DB
     const newProduct = await Product.create(
       userId,
@@ -36,37 +36,37 @@ export const addProduct = async(req,res)=>{
       productImg, //array of objects--> [{url, public_id},{url, public_id}]
     )
     return res.status(200).json({
-      success:true,
-      message:"Product added successfully",
-      product:newProduct
+      success: true,
+      message: "Product added successfully",
+      product: newProduct
     })
- 
+
 
   } catch (error) {
     return res.status(500).json({
-      success:false,message:error.message
+      success: false, message: error.message
     })
   }
 }
 
-export const getAllProduct = async(_,res)=>{
+export const getAllProduct = async (_, res) => {
   try {
     const products = await Product.find()
-    if(!products){
+    if (!products) {
       return res.status(404).json({
-        success:false,
-        message:"No product available",
-        products:[]
+        success: false,
+        message: "No product available",
+        products: []
       })
     }
     return res.status(200).json({
-      success:true,
+      success: true,
       products,
     })
   } catch (error) {
     return res.status(500).json({
-      success:false,
-      message:error.message
+      success: false,
+      message: error.message
     })
   }
 } 
