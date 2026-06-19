@@ -5,16 +5,16 @@ import getDataUri from "../utils/dataUri.js";
 export const addProduct = async (req, res) => {
   try {
     const { productName, productDesc, productPrice, catagory, brand } = req.body;
+    // accept both `category` and misspelled `catagory` from clients
+    const category = req.body.category || catagory
     const userId = req.id;
-    if (!productName || !productDesc || !productPrice || !catagory || !brand) {
-      return res.status(400).json({
-        success: false, message: "All fields are required!"
-      })
+    if (!productName || !productDesc || !productPrice || !category || !brand) {
+      return res.status(400).json({ success: false, message: "All fields are required!" })
     }
 
     //array of images to store the uploaded images in cloudinary and then store the url and public_id in DB.
     let productImg = [];
-
+    
     //files is an array of images uploaded by the user. We will loop through each image and upload it to cloudinary and then store the url and public_id in productImg array.
     if (req.files && req.files.length > 0) {
       for (let file of req.files) {
@@ -29,15 +29,16 @@ export const addProduct = async (req, res) => {
       }
     }
 
-    //create a product in DB
-    const newProduct = await Product.create(
+    //create a product in DB - pass a single document object to Mongoose
+    const newProduct = await Product.create({
       userId,
       productName,
       productDesc,
-      productPrice,
-      catagory,
-      brand //array of objects--> [{url, public_id},{url, public_id}]
-    )
+      productPrice: Number(productPrice),
+      category,
+      brand,
+      productImg, //array of objects--> [{url, public_id},{url, public_id}]
+    })
     return res.status(200).json({
       success: true,
       message: "Product added successfully",

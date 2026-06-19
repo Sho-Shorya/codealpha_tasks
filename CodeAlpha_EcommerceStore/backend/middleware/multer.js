@@ -11,4 +11,5 @@ const storage = multer.diskStorage({
 
 export const singleUpload = multer({ storage }).single("file")
 
-export const multipleUpload = multer({ storage }).array("file",5)
+// Expect field name `files` for multiple uploads (matches frontend/Postman)
+export const multipleUpload = multer({ storage }).array("files", 5)
