@@ -110,8 +110,7 @@ export const deleteProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { productName, productDesc, productPrice, catagory, brand, existingImages } = req.body;
-    const category = req.body.category || category
+    const { productName, productDesc, productPrice, category, brand, existingImages } = req.body;
 
     const product = await Product.findById(productId)
 
