@@ -137,9 +137,12 @@ export const logout = async (req, res) => {
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email })
     if (!email) {
-      return res.status(400).json({ success: false, message: "User not found" })
+      return res.status(400).json({ success: false, message: "Email is required" })
+    }
+    const user = await User.findOne({ email })
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" })
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString()
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000) //10m 
@@ -149,8 +152,8 @@ export const forgotPassword = async (req, res) => {
     await sendOptMail(otp, email)
 
     return res.status(200).json({
-      succes: true,
-      message: "Opt sent to email successfully"
+      success: true,
+      message: "OTP sent to email successfully"
     })
   } catch (error) {
     return res.status(500).json({
@@ -256,7 +259,8 @@ export const allUser = async (_, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    const userId = req.params; //extracting user ID from request params
+    const userId = req.params.userId || req.params.id
+    // extracting user ID from request params (supports both :userId and :id)
     const user = await User.findById(userId).select("-password -otp -otpExpiry -token")
     if (!user) {
       return res.status(404).json({
@@ -296,12 +300,17 @@ export const updateUser = async (req, res) => {
         message: "User not found!"
       })
     }
-    let profilePicUrl = user.profilePicUrl
-    let profilePicPublicId = user.profilePicPublicId
+    // use the fields that actually exist on the model
+    let profilePicUrl = user.profilePic || ""
+    let profilePicPublicId = user.profilePicPublicId || ""
 
-    //if a new file is uploaded
-    // if a new file is uploaded
-    if (req.file) {
+    // if files are present, enforce a single-file upload for profile updates
+    if (Array.isArray(req.files) && req.files.length > 1) {
+      return res.status(400).json({ success: false, message: "Only one file allowed for profile update" })
+    }
+    // accept either req.file (single) or the single element in req.files
+    const fileToUpload = req.file || (Array.isArray(req.files) && req.files.length === 1 && req.files[0])
+    if (fileToUpload) {
       if (profilePicPublicId) {
         await cloudinary.uploader.destroy(profilePicPublicId)
       }
@@ -315,7 +324,7 @@ export const updateUser = async (req, res) => {
           }
         )
 
-        stream.end(req.file.buffer)
+        stream.end(fileToUpload.buffer)
       })
 
       profilePicUrl = uploadResult.secure_url
