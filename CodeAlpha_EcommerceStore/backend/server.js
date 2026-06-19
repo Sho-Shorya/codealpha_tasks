@@ -15,7 +15,7 @@ app.use(cors())
 
 app.use('/api/v1/user', userRoute)
 app.use('/api/v1/product', productRoute)
-app.use('/debug', debugRoute)
+app.use('/api/v1/debug', debugRoute)
 
 
 // http://localhost:8000/api/v1/user/register

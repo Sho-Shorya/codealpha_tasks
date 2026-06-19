@@ -8,10 +8,14 @@ export const addProduct = async (req, res) => {
     const userId = req.id;
     if (!productName || !productDesc || !productPrice || !catagory || !brand) {
       return res.status(400).json({
-        success: false, message: "All feids are required!"
+        success: false, message: "All fields are required!"
       })
     }
+
+    //array of images to store the uploaded images in cloudinary and then store the url and public_id in DB.
     let productImg = [];
+
+    //files is an array of images uploaded by the user. We will loop through each image and upload it to cloudinary and then store the url and public_id in productImg array.
     if (req.files && req.files.length > 0) {
       for (let file of req.files) {
         const fileUri = getDataUri(file)
@@ -32,8 +36,7 @@ export const addProduct = async (req, res) => {
       productDesc,
       productPrice,
       catagory,
-      brand,
-      productImg, //array of objects--> [{url, public_id},{url, public_id}]
+      brand //array of objects--> [{url, public_id},{url, public_id}]
     )
     return res.status(200).json({
       success: true,
