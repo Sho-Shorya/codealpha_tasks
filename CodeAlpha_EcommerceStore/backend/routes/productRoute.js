@@ -10,4 +10,7 @@ router.get("/getallproducts", getallproducts)
 router.delete("/delete/:productId", isAuthenticated, isAdmin, deleteProduct)
 router.put("/update/:productId", isAuthenticated, isAdmin, multipleUpload, updateProduct)
 
+router.post("/category")
+router.post("/offers")
+
 export default router 
