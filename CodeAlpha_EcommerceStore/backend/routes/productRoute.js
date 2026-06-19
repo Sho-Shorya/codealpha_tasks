@@ -6,7 +6,7 @@ import { multipleUpload } from "../middleware/multer.js"
 const router = Router()
 
 router.post("/add", isAuthenticated, isAdmin, multipleUpload, addProduct)
-router.get("/getallproducts", getAllProduct)
+router.get("/getallproducts", getallproducts)
 router.get("/delete/:productId", isAuthenticated, isAdmin, deleteProduct)
 router.get("/update/:productId", isAuthenticated, isAdmin, multipleUpload, updateProduct)
 
