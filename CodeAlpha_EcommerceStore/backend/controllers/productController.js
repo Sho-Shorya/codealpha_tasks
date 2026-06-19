@@ -15,17 +15,18 @@ export const addProduct = async (req, res) => {
     //array of images to store the uploaded images in cloudinary and then store the url and public_id in DB.
     let productImg = [];
     
-    //files is an array of images uploaded by the user. We will loop through each image and upload it to cloudinary and then store the url and public_id in productImg array.
-    if (req.files && req.files.length > 0) {
-      for (let file of req.files) {
+    // files may come from multiple sources depending on the client UI:
+    // - `req.files` (array) when multiple files are uploaded
+    // - `req.file` (single) when one file is uploaded
+    const uploadedFiles = []
+    if (Array.isArray(req.files) && req.files.length > 0) uploadedFiles.push(...req.files)
+    else if (req.file) uploadedFiles.push(req.file)
+
+    if (uploadedFiles.length > 0) {
+      for (let file of uploadedFiles) {
         const fileUri = getDataUri(file)
-        const result = await cloudinary.uploader.upload(fileUri, {
-          folder: "mern_products"
-        })
-        productImg.push({
-          url: result.secure_url,
-          public_id: result.public_id
-        })
+        const result = await cloudinary.uploader.upload(fileUri, { folder: "mern_products" })
+        productImg.push({ url: result.secure_url, public_id: result.public_id })
       }
     }
 
