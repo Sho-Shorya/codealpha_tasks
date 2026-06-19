@@ -7,7 +7,7 @@ export const addProduct = async (req, res) => {
     const { productName, productDesc, productPrice, catagory, brand } = req.body;
     // accept both `category` and misspelled `catagory` from clients
     const category = req.body.category || catagory
-    const userId = req.id;
+    const userId = req.userId || req.user?._id;
     if (!productName || !productDesc || !productPrice || !category || !brand) {
       return res.status(400).json({ success: false, message: "All fields are required!" })
     }
@@ -102,11 +102,8 @@ export const deleteProduct = async (req, res) => {
       message: "Product deleted successfully"
     })
 
-  } catch {
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    })
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message })
   }
 }
 
@@ -114,6 +111,7 @@ export const updateProduct = async (req, res) => {
   try {
     const { productId } = req.params;
     const { productName, productDesc, productPrice, catagory, brand, existingImages } = req.body;
+    const category = req.body.category || category
 
     const product = await Product.findById(productId)
 
@@ -140,7 +138,7 @@ export const updateProduct = async (req, res) => {
       updatedImages = product.productImg
     }
 
-    if (req.files && req.files.length > 0) {
+    if (Array.isArray(req.files) && req.files.length > 0) {
       for (let file of req.files) {
         const fileUri = getDataUri(file)
         const result = await cloudinary.uploader.upload(fileUri, { folder: "mern_products" })
@@ -153,9 +151,9 @@ export const updateProduct = async (req, res) => {
 
     product.productName = productName || product.productName
     product.productDesc = productDesc || product.productDesc
-    product.productPrice = productPrice || product.productPrice
+    product.productPrice = productPrice !== undefined ? Number(productPrice) : product.productPrice
     product.category = category || product.category
-    product.bramd = bramd || product.bramd
+    product.brand = brand || product.brand
     product.productImg = updatedImages
 
     await product.save()
@@ -164,10 +162,7 @@ export const updateProduct = async (req, res) => {
       success: true,
       message: "Product updated successfully"
     })
-  } catch {
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    })
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message })
   }
 }

@@ -7,7 +7,7 @@ const router = Router()
 
 router.post("/add", isAuthenticated, isAdmin, multipleUpload, addProduct)
 router.get("/getallproducts", getallproducts)
-router.get("/delete/:productId", isAuthenticated, isAdmin, deleteProduct)
-router.get("/update/:productId", isAuthenticated, isAdmin, multipleUpload, updateProduct)
+router.delete("/delete/:productId", isAuthenticated, isAdmin, deleteProduct)
+router.put("/update/:productId", isAuthenticated, isAdmin, multipleUpload, updateProduct)
 
 export default router 
