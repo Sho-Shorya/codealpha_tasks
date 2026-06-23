@@ -61,7 +61,8 @@ const Signup = () => {
   }
   return (
     <div className='flex justify-center items-center min-h-screen bg-emerald-100'>
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm relative">
+          <img src="arrow-left.png" onClick={() => navigate('/')} className=" absolute top-7 -left-13 h-[18px] cursor-pointer " />
         <CardHeader>
           <CardTitle>Create a new account</CardTitle>
           <CardDescription>
