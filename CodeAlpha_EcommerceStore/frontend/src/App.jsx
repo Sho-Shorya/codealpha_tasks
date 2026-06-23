@@ -9,19 +9,22 @@ import Verify from './pages/Verify'
 import VerifyEmail from './pages/VerifyEmail'
 import Footer from './components/Footer'
 import Profile from './pages/Profile'
+import ProductsList from './components/ProductsList'
+import Categories from './pages/Categories'
+import Offers from './pages/Offers'
 
 const router = createBrowserRouter([
   {
-    path:'/',
-    element:<> <Navbar/> <Home/> <Footer/></>
+    path: '/',
+    element: <> <Navbar /> <Home /> <Footer /></>
   },
   {
-    path:'/signup',
-    element:<><Signup/></>
+    path: '/signup',
+    element: <><Signup /></>
   },
   {
-    path:'/login',
-    element:<><Login/></>
+    path: '/login',
+    element: <><Login /></>
   },
   // {
   //   path:'/verify',
@@ -32,16 +35,30 @@ const router = createBrowserRouter([
   //   element:<><VerifyEmail/></>
   // },
   {
-    path:'/profile/:userId',
-    element:<><Navbar/><Profile /></>
+    path: '/profile/:userId',
+    element: <><Navbar /><Profile /></>
+  },
+  {
+    path: '/product',
+    element: <><Navbar /><ProductsList /><Footer /></>
   }
-  
+
+  ,
+  {
+    path: '/categories',
+    element: <><Navbar /><Categories /><Footer /></>
+  },
+  {
+    path: '/offers',
+    element: <><Navbar /><Offers /><Footer /></>
+  }
+
 ])
 const App = () => {
   return (
     <div className='text-3xl font-bold'>
       <>
-        <RouterProvider router = {router}/>
+        <RouterProvider router={router} />
       </>
     </div>
   )
