@@ -121,6 +121,8 @@ const Navbar = () => {
       }
     } catch (err) {
       const status = err?.response?.status
+      const serverMessage = err?.response?.data?.message || err?.response?.data || err?.message
+      console.warn('Logout request failed', err, err?.response?.data)
       if (status === 401 || status === 403) {
         // token invalid/expired — clear client anyway
         dispatch(setUser(null))
@@ -129,8 +131,7 @@ const Navbar = () => {
         navigate('/login')
       } else {
         // network/server error — don't wipe local state
-        console.warn('Logout request failed', err?.message || err)
-        toast.error('Logout failed — please try again')
+        toast.error(serverMessage || 'Logout failed — please try again')
       }
     } finally {
       setLoading(false)

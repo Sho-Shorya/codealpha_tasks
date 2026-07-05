@@ -9,7 +9,7 @@ import Verify from './pages/Verify'
 import VerifyEmail from './pages/VerifyEmail'
 import Footer from './components/Footer'
 import Profile from './pages/Profile'
-import ProductsList from './components/ProductsList'
+import ProductsList from './pages/ProductsList'
 import Categories from './pages/Categories'
 import Offers from './pages/Offers'
 
