@@ -94,7 +94,7 @@ export const UpdateQuantity = async (req, res) => {
 
     const item = cart.items.find(item => item.productId.toString() === productId)
     if (!item) return res.status(404).json({ success: false, message: "Item not found" })
-    if (type === "incerese") item.quantity += 1
+    if (type === "increase") item.quantity += 1
     if (type === "decrease" && item.quantity > 1) item.quantity -= 1
 
     cart.totalPrice = cart.items.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 0), 0)
