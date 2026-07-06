@@ -40,8 +40,8 @@ const ProductsList = () => {
     }, [])
 
     return (
-        <div className=' w-full min-h-screen p-2 bg-white'>
-            <div className='my-5 mx-40'>
+        <div className='w-full min-h-screen p-2 bg-white'>
+                <div className='my-5 mx-auto max-w-6xl px-4'>
                 <div className='flex flex-col'>
                     <div className='flex justify-end'>
                         <Select>
@@ -57,7 +57,7 @@ const ProductsList = () => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className='py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-7'>
+                    <div className='py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-7'>
                         {
                             allProducts.map((product) => {
                                 return <ProductCard key={product._id} product={product} loading={loading}/>

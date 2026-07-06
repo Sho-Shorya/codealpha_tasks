@@ -5,12 +5,12 @@ import { FaFacebook, FaInstagram, FaPinterest, FaTwitterSquare } from "react-ico
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-200 py-10">
-      <div className="max-w-5xl mx-auto px-4 md:flex md:justify-between gap-5">
+      <div className="max-w-6xl mx-auto px-4 md:flex md:justify-between gap-5">
 
         {/* Info Section */}
         <div className="mb-6 md:mb-0">
           <Link to="/">
-            <img src="/Ekart1.png" alt="EKart Logo" className="w-22" />
+            <img src="/Ekart1.png" alt="EKart Logo" className="w-28 h-auto" />
           </Link>
           <p className="mt-2 text-sm">
             Powering Your World with the Best in Electronics.
@@ -46,20 +46,20 @@ const Footer = () => {
         </div>
 
         {/* Newsletter */}
-        <div className="w-200px">
+        <div className="w-full md:w-64">
           <h3 className="text-xl font-semibold">Stay in the Loop</h3>
           <p className="mt-2 text-sm word-wrap">
             Subscribe to get special offers.
           </p>
-          <form className="lg:mt-4 lg:flex flex flex-col w-50px "> 
+          <form className="mt-4 flex flex-col md:flex-row gap-2">
             <input
               type="email"
               placeholder="Your email address"
-              className=" p-2 lg:text-[15px] lg:mt-0 mt-[15px] text-[10px] bg-white rounded-md lg:rounded-l-md border border-white-500 text-black focus:outline-none focus:ring-2 "
+              className="flex-1 p-2 text-sm bg-white rounded-md border border-white/40 text-black focus:outline-none focus:ring-2"
             />
             <button
               type="submit"
-              className="bg-emerald-600 lg:mt-0 lg:text-[15px] mt-[15px] text-[10px] text-white lg:px-4 p-2 lg:rounded-r-md rounded-md hover:bg-red-700 cursor-pointer"
+              className="bg-emerald-600 text-sm text-white px-4 py-2 rounded-md hover:bg-emerald-700 cursor-pointer"
             >
               Subscribe
             </button>
