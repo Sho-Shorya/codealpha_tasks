@@ -1,5 +1,7 @@
 import { Cart } from "../models/cartModel.js";
 import { Product } from "../models/productModel.js";
+import { User } from "../models/userModel.js";
+import { sendOrderEmail } from "../emailVerify/sendOrderEmail.js";
 
 export const getCart = async (req, res) => {
   try {
@@ -114,6 +116,48 @@ export const UpdateQuantity = async (req, res) => {
   }
 }
 
+export const checkoutCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const cart = await Cart.findOne({ userId }).populate("items.productId")
+    if (!cart || !cart.items.length) {
+      return res.status(400).json({ success: false, message: "Cart is empty" })
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" })
+    }
+
+    const orderItems = cart.items.map((item) => ({
+      name: item.productId?.productName || 'Product',
+      quantity: item.quantity,
+      price: item.price,
+      total: (item.price || 0) * (item.quantity || 0)
+    }))
+
+    const orderTotal = cart.items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0)
+
+    const emailSent = await sendOrderEmail(user.email, user.firstName || 'Customer', orderItems, orderTotal)
+
+    cart.items = []
+    cart.totalPrice = 0
+    await cart.save()
+
+    return res.status(200).json({
+      success: true,
+      message: emailSent ? 'Order placed successfully. Thank you!' : 'Order placed successfully. Email could not be sent.',
+      cart: { items: [] }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
+
 export const removeFromCart = async (req, res) => {
   try {
     const userId = req.userId;
@@ -130,9 +174,10 @@ export const removeFromCart = async (req, res) => {
     cart.totalPrice = cart.items.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 0), 0)
 
     await cart.save()
+    const populatedCart = await Cart.findById(cart._id).populate("items.productId")
     return res.status(200).json({
       success: true,
-      cart
+      cart: populatedCart
     })
   } catch (error) {
     return res.status(500).json({
