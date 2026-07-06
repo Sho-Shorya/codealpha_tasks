@@ -1,6 +1,6 @@
 import express, { Router } from "express"
 import { addToCart, getCart, removeFromCart, UpdateQuantity } from "../controllers/cartController.js"
-
+import { isAuthenticated } from "../middleware/isAuthenticated.js"
 const router = Router()
 
 router.get("/", isAuthenticated, getCart)
