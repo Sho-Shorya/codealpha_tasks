@@ -3,6 +3,7 @@ import 'dotenv/config'
 import { connectDb } from "./database/db.js";
 import userRoute from "./routes/userRoute.js"
 import productRoute from "./routes/productRoute.js"
+import cartRoute from "./routes/cartRoute.js"
 import debugRoute from "./routes/debugRoute.js"
 import categoryRoute from "./routes/categoryRoute.js"
 import offerRoute from "./routes/offerRoute.js"
@@ -17,6 +18,7 @@ app.use(cors())
 
 app.use('/api/v1/user', userRoute)
 app.use('/api/v1/product', productRoute)
+app.use('/api/v1/cart', cartRoute)
 app.use('/api/v1/debug', debugRoute)
 app.use('/api/v1/categories', categoryRoute)
 app.use('/api/v1/offers', offerRoute)
