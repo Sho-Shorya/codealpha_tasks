@@ -1,7 +1,7 @@
 import { Cart } from "../models/cartModel.js";
 import { Product } from "../models/productModel.js";
 import { User } from "../models/userModel.js";
-import { sendOrderEmail } from "../emailVerify/sendOrderEmail.js";
+// removed sendOrderEmail import to avoid sending emails during checkout
 
 export const getCart = async (req, res) => {
   try {
@@ -139,15 +139,14 @@ export const checkoutCart = async (req, res) => {
 
     const orderTotal = cart.items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0)
 
-    const emailSent = await sendOrderEmail(user.email, user.firstName || 'Customer', orderItems, orderTotal)
-
+    // Skip sending email to reduce checkout latency; clear cart and return immediate success
     cart.items = []
     cart.totalPrice = 0
     await cart.save()
 
     return res.status(200).json({
       success: true,
-      message: emailSent ? 'Order placed successfully. Thank you!' : 'Order placed successfully. Email could not be sent.',
+      message: 'Order placed successfully. Thank you!',
       cart: { items: [] }
     })
   } catch (error) {
