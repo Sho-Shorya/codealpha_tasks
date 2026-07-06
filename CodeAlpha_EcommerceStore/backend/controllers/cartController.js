@@ -7,7 +7,7 @@ export const getCart = async (req, res) => {
 
     const cart = await Cart.findOne({ userId }).populate("items.productId")
     if (!cart) {
-      return res.status(200).json({ success: true, cart: [] })
+      return res.status(200).json({ success: true, cart: { items: [] } })
     }
     return res.status(200).json({
       success: true,
@@ -57,7 +57,8 @@ export const addToCart = async (req, res) => {
       }
 
       cart.totalPrice = cart.items.reduce(
-        (acc, item) => acc + item.price * item.quantity
+        (acc, item) => acc + (item.price || 0) * (item.quantity || 0),
+        0
       )
     }
 
@@ -96,7 +97,7 @@ export const UpdateQuantity = async (req, res) => {
     if (type === "incerese") item.quantity += 1
     if (type === "decrease" && item.quantity > 1) item.quantity -= 1
 
-    cart.totalPrice = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    cart.totalPrice = cart.items.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 0), 0)
 
     await cart.save()
     cart = await cart.populate("items.productId")
@@ -126,7 +127,7 @@ export const removeFromCart = async (req, res) => {
       })
     }
     cart.items = cart.items.filter(item => item.productId.toString() != productId)
-    cart.totalPrice = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    cart.totalPrice = cart.items.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 0), 0)
 
     await cart.save()
     return res.status(200).json({
