@@ -39,7 +39,7 @@ export const addToCart = async (res, req) => {
     if (!cart) {
       cart = new Cart({
         userId,
-        items =[{ productId, quantity: 1, price: product.productPrice }],
+        items:[{ productId, quantity: 1, price: product.productPrice }],
         totalPrice: product.productPrice
       })
     } else {
