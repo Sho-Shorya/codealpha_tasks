@@ -10,6 +10,10 @@ const Home = () => {
     <div className='w-screen overflow-hidden'>
       {user ? (
         <>
+          <><div className='flex flex-col items-center mt-16'>
+                <h1 className='mt-5 text-3xl font-bold text-gray-800'>Our Products</h1>
+                <p className='text-gray-600 font-light text-[15px]'>Discover our wide range of electronic products.</p>
+            </div></>
           <ProductsList />
         </>
       ) : (

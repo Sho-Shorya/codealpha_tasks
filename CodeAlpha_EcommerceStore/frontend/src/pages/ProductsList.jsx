@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Select,
     SelectContent,
@@ -7,28 +7,62 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Card } from '@/components/ui/card'
+import ProductCard from '@/components/ProductCard'
+import axios from 'axios'
+import { toast } from 'sonner'
+import { API_BASE_URL } from '@/lib/constants'
+
 const ProductsList = () => {
+    const [allProducts, setAllProducts] = useState([])
+    const [loading, setLoading] = useState(false)
+
+    const getAllProducts = async () => {
+
+        try {
+            setLoading(true)
+            const res = await axios.get(`${API_BASE_URL}/api/v1/product/getallproducts`);
+            if (res.data.success) {
+                setAllProducts(res.data.products)
+            } else {
+                toast.error(res.data.message || 'Unable to load products')
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error(error.response?.data?.message || 'Failed to load products')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        getAllProducts()
+    }, [])
+
     return (
-        <div className='mt-16 w-full min-h-screen p-2 bg-gray-200'>
-            <div className='flex flex-col items-center'>
-                <h1 className='mt-5 text-3xl font-bold text-gray-800'>Our Products</h1>
-                <p className='text-gray-600 font-light text-[15px]'>Discover our wide range of electronic products.</p>
-            </div>
-            <div className='grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 my-5 mx-40'>
+        <div className=' w-full min-h-screen p-2 bg-white'>
+            <div className='my-5 mx-40'>
                 <div className='flex flex-col'>
-                    <div>
+                    <div className='flex justify-end'>
                         <Select>
                             <SelectTrigger className="w-[200px]">
                                 <SelectValue placeholder="Sort by price" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectItem value="light">Light</SelectItem>
-                                    <SelectItem value="dark">Dark</SelectItem>
-                                    <SelectItem value="system">System</SelectItem>
+                                    <SelectItem value="default">Default</SelectItem>
+                                    <SelectItem value="ltoh">Low to high</SelectItem>
+                                    <SelectItem value="htol">High to low</SelectItem>
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                    </div>
+                    <div className='py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-7'>
+                        {
+                            allProducts.map((product) => {
+                                return <ProductCard key={product._id} product={product} loading={loading}/>
+                            })
+                        }
                     </div>
                 </div>
             </div>
