@@ -237,7 +237,7 @@ const Navbar = () => {
                     <nav className="py-1" aria-label="User options">
                       <Link to={`/profile/${user._id}`} className="text-[20px] flex items-center gap-3 px-4 py-2 hover:bg-emerald-50" role="menuitem">Profile</Link>
                       <Link to="/orders" className="text-[20px] flex items-center gap-3 px-4 py-2 hover:bg-emerald-50" role="menuitem">Orders</Link>
-                      <Link to="/settings" className="text-[20px] flex items-center gap-3 px-4 py-2 hover:bg-emerald-50" role="menuitem">Settings</Link>
+                      {/* <Link to="/settings" className="text-[20px] flex items-center gap-3 px-4 py-2 hover:bg-emerald-50" role="menuitem">Settings</Link> */}
                     </nav>
                     <div className="px-4 py-3">
                       <button onClick={logoutHandler} disabled={loading} className="text-[20px] w-full text-left px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded">{loading ? 'Logging out...' : 'Logout'}</button>
