@@ -272,14 +272,13 @@ const Navbar = () => {
           </div>
 
           <div className="mt-6 flex flex-col gap-4">
-            <Link to="/products" onClick={() => setSlideBar(false)} className="text-lg">Products</Link>
-            <Link to="/categories" onClick={() => setSlideBar(false)} className="text-lg">Categories</Link>
+            <Link to="/product" onClick={() => setSlideBar(false)} className="text-lg">Products</Link>
             <Link to="/offers" onClick={() => setSlideBar(false)} className="text-lg">Offers</Link>
             <form onSubmit={(e) => { onSearchSubmit(e); setSlideBar(false); }} className="flex gap-2">
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="flex-1 px-3 py-2 rounded border" />
               <Button type="submit">Go</Button>
             </form>
-            <Link to="/cart" onClick={() => setSlideBar(false)} className="flex items-center gap-2">Cart <span className="ml-2 inline-block bg-emerald-500 text-white rounded-full w-6 h-6 text-center">{cartCount}</span></Link>
+            <Link to="/cart" onClick={() => setSlideBar(false)} className="flex items-center gap-2">Cart <span className="ml-2 inline-block bg-emerald-500 text-white rounded-sm w-8 h-9 text-center">{cartCount}</span></Link>
 
             {user ? (
               <>

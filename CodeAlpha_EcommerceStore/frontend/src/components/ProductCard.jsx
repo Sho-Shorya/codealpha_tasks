@@ -40,27 +40,27 @@ const ProductCard = ({ product, loading }) => {
         }
     }
     return (
-        <div className='shadow-lg rounded-lg overflow-hidden h-max bg-white'>
-            <div className='w-full h-full aspect-square overflow-hidden'>
+        <div className='flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md sm:shadow-lg'>
+            <div className='aspect-square w-full overflow-hidden bg-gray-50'>
                 {
-                    loading ? <Skeleton className='bg-gray-500 w-full h-full rounded-lg' /> : <img src={productImg[0]?.url} className='w-full h-full transition-transform duration-300 hover:scale-105 cursor-pointer' />
+                    loading ? <Skeleton className='h-full w-full rounded-none bg-gray-300' /> : <img src={productImg[0]?.url} alt={productName} className='h-full w-full object-cover transition-transform duration-300 hover:scale-105 cursor-pointer' />
 
                 }
             </div>
             {
-                loading ? <div className='px-2 space-y-2 my-2'>
-                    <Skeleton className='w-[200px] h-4' />
-                    <Skeleton className='w-[100px] h-4' />
-                    <Skeleton className='w-[150px] h-8' />
+                loading ? <div className='space-y-2 px-3 py-3 sm:px-4'>
+                    <Skeleton className='h-4 w-full' />
+                    <Skeleton className='h-4 w-24' />
+                    <Skeleton className='h-9 w-full' />
                 </div> :
-                    <div className='px-3 py-2 space-y-2'>
-                        <h1 className='font-semibold text-sm md:text-base h-12 line-clamp-2'>
+                    <div className='flex flex-1 flex-col gap-2 px-3 py-3 sm:px-4 sm:py-4'>
+                        <h1 className='min-h-[2.5rem] text-sm font-semibold leading-5 text-gray-800 line-clamp-2 sm:text-base'>
                             {productName}
                         </h1>
-                        <h2 className='font-bold text-lg'>
+                        <h2 className='text-lg font-bold text-emerald-700'>
                             ₹{productPrice}
                         </h2>
-                        <Button onClick={()=> (addToCart(product._id))} className='bg-pink-600 mb-0 w-full py-2 flex items-center justify-center gap-2'><ShoppingCart />Add to Cart</Button>
+                        <Button onClick={()=> (addToCart(product._id))} className='mt-auto flex w-full items-center justify-center gap-2 rounded-lg bg-pink-600 py-2 text-sm font-medium sm:py-2.5'><ShoppingCart className='h-4 w-4' />Add to Cart</Button>
                     </div>
             }
         </div>

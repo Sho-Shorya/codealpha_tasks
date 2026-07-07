@@ -29,7 +29,11 @@ const Offers = () => {
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Offers</h1>
       {offers.length === 0 ? (
-        <div>No active offers currently.</div>
+        <div className='flex flex-col justify-center items-center text-center'>
+          <img src='error.png ' alt='error' className='h-full m-5'></img>
+          <span className='text-[60px] text-red-600'>Oh No!</span>
+          <p className='text-[20px] text-gray-400'>No active offers currently.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
           {offers.map((o) => (

@@ -1,6 +1,7 @@
 import { Cart } from "../models/cartModel.js";
 import { Product } from "../models/productModel.js";
 import { User } from "../models/userModel.js";
+import { Order } from "../models/orderModel.js";
 // removed sendOrderEmail import to avoid sending emails during checkout
 
 export const getCart = async (req, res) => {
@@ -131,6 +132,7 @@ export const checkoutCart = async (req, res) => {
     }
 
     const orderItems = cart.items.map((item) => ({
+      productId: item.productId?._id,
       name: item.productId?.productName || 'Product',
       quantity: item.quantity,
       price: item.price,
@@ -139,7 +141,15 @@ export const checkoutCart = async (req, res) => {
 
     const orderTotal = cart.items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0)
 
-    // Skip sending email to reduce checkout latency; clear cart and return immediate success
+    const order = await Order.create({
+      userId,
+      items: orderItems,
+      totalAmount: orderTotal,
+      status: 'Processing',
+      shippingAddress: user.address || '',
+      paymentMethod: 'COD',
+    })
+
     cart.items = []
     cart.totalPrice = 0
     await cart.save()
@@ -147,12 +157,30 @@ export const checkoutCart = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Order placed successfully. Thank you!',
-      cart: { items: [] }
+      cart: { items: [] },
+      order
     })
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: error.message
+    })
+  }
+}
+
+export const getUserOrders = async (req, res) => {
+  try {
+    const userId = req.userId
+    const orders = await Order.find({ userId }).sort({ createdAt: -1 })
+
+    return res.status(200).json({
+      success: true,
+      orders,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
     })
   }
 }

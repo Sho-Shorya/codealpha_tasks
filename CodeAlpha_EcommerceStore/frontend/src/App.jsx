@@ -13,6 +13,7 @@ import ProductsList from './pages/ProductsList'
 import Categories from './pages/Categories'
 import Offers from './pages/Offers'
 import Cart from './pages/Cart'
+import Orders from './pages/Orders'
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
     element: <><Navbar /><ProductsList /><Footer /></>
   },
   {
+    path: '/products',
+    element: <><Navbar /><ProductsList /><Footer /></>
+  },
+  {
     path: '/categories',
     element: <><Navbar /><Categories /><Footer /></>
   },
@@ -54,6 +59,10 @@ const router = createBrowserRouter([
   {
     path: '/cart',
     element: <><Navbar /><Cart /><Footer /></>
+  },
+  {
+    path: '/orders',
+    element: <><Navbar /><Orders /><Footer /></>
   }
 
 ])
