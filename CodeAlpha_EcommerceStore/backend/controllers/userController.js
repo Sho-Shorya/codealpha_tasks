@@ -285,7 +285,16 @@ export const updateUser = async (req, res) => {
     const userIdToUpdate = req.params.userId
     //the id of the user we want to update
     const loggedInUser = req.user //from isAuthenticated middleware
-    const { firstName, lastName, address, city, zipCode, phoneNo, role } = req.body
+
+    // Validate that userIdToUpdate is provided and not "undefined"
+    if (!userIdToUpdate || userIdToUpdate === 'undefined') {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required for profile update"
+      })
+    }
+
+    const { firstName, lastName, address, city, zipCode, phoneNo, role, bio, country, gender } = req.body
 
     if (loggedInUser._id.toString() !== userIdToUpdate && loggedInUser.role !== 'admin') {
       return res.status(403).json({
@@ -338,6 +347,9 @@ export const updateUser = async (req, res) => {
     user.zipCode = zipCode || user.zipCode
     user.phoneNo = phoneNo || user.phoneNo
     user.role = role || user.role
+    user.bio = bio !== undefined ? bio : user.bio
+    user.country = country !== undefined ? country : user.country
+    user.gender = gender !== undefined ? gender : user.gender
     user.profilePic = profilePicUrl
     user.profilePicPublicId = profilePicPublicId
 

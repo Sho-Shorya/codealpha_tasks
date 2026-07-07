@@ -17,6 +17,9 @@ const userSchema = new mongoose.Schema({
   city: { type: String },
   zipCode: { type: String },
   phoneNo: { type: String },
+  bio: { type: String, default: '' },
+  country: { type: String, default: '' },
+  gender: { type: String, default: '' },
 }, { timestamps: true }) //gives timeStamps for "Created at" and "updated at"
 
 export const User = mongoose.model("User", userSchema)

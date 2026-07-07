@@ -170,6 +170,8 @@ const Navbar = () => {
     return String(ch).toUpperCase()
   })()
 
+  const avatarUrl = user?.profilePicUrl || user?.profilePic || user?.avatar || ''
+
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-gray-100 backdrop-blur-sm border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-4 lg:px-6">
@@ -210,8 +212,8 @@ const Navbar = () => {
               <div className="relative" ref={userMenuRef}>
                 <button id="user-menu-button" onClick={() => setShowUserMenu((s) => !s)} className="flex items-center gap-2 px-2 py-1 rounded-full bg-white hover:shadow-sm focus:shadow-outline focus:outline-none" aria-haspopup="true" aria-expanded={showUserMenu} aria-controls="user-menu">
                   <div className="relative flex items-center">
-                    {user?.profilePicUrl ? (
-                      <img src={user.profilePicUrl} alt="avatar" className="h-9 w-9 rounded-full object-cover ring-2 ring-emerald-50 shadow-sm" />
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="avatar" className="h-9 w-9 rounded-full object-cover ring-2 ring-emerald-50 shadow-sm" />
                     ) : (
                       <div className="h-9 w-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-medium ring-2 ring-emerald-50 shadow-sm">{avatarInitial}</div>
                     )}
@@ -223,8 +225,8 @@ const Navbar = () => {
                     <div className="absolute right-4 -top-3 w-3 h-3 bg-white rotate-45 border-l border-t border-gray-100" aria-hidden="true" />
                     <div className="px-4 py-3 border-b">
                       <div className="flex items-center gap-3">
-                        {user?.profilePicUrl ? (
-                          <img src={user.profilePicUrl} alt="avatar" className="max-h-10 w-10 rounded-full object-cover" />
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt="avatar" className="max-h-10 w-10 rounded-full object-cover" />
                         ) : (
                           <div className="h-10 w-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-medium">{avatarInitial}</div>
                         )}

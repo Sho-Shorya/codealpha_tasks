@@ -48,7 +48,7 @@ const Orders = () => {
           <div className='space-y-4'>
             {orders.map((order, index) => (
               <div key={order._id || index} className='rounded-2xl border border-gray-200 p-4'>
-                <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                <div className='flex flex-col gap-3 overflow-hidden text-[23px] sm:flex-row sm:items-center sm:justify-between'>
                   <div>
                     <p className='font-semibold text-gray-800'>{order._id || `Order ${index + 1}`}</p>
                     <p className='text-sm text-gray-500'>{new Date(order.createdAt).toLocaleString()}</p>
@@ -61,7 +61,7 @@ const Orders = () => {
                 <div className='mt-4 grid gap-2 md:grid-cols-2'>
                   {order.items?.map((item, itemIndex) => (
                     <div key={`${order._id || index}-${itemIndex}`} className='flex items-center gap-3 rounded-lg bg-gray-50 p-2'>
-                      <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-gray-200 text-xs text-gray-500'>{item.name?.charAt(0) || 'P'}</div>
+                      <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-gray-200 text-xs text-gray-500'>{'⏩'}</div>
                       <div>
                         <p className='text-sm font-medium text-gray-700'>{item.name}</p>
                         <p className='text-xs text-gray-500'>Qty: {item.quantity || 1}</p>

@@ -1,11 +1,4 @@
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
   Tabs,
   TabsContent,
   TabsList,
@@ -23,45 +16,89 @@ import { API_BASE_URL } from '@/lib/constants'
 
 const Profile = () => {
   const { user } = useSelector(store => store.user)
-
-  const [updateUser, setUpdateUser] = useState({
-    firstName: user?.firstName,
-    lastName: user?.lastName,
-    email: user?.email,
-    phoneNo: user?.phoneNo,
-    address: user?.address,
-    city: user?.city,
-    zipCode: user?.zipCode,
-    profilePic: user?.profilePic,
-    role: user?.role,
-  })
-  const [file, setFile] = useState(null);
-  const [orders, setOrders] = useState([])
+  const [displayUser, setDisplayUser] = useState(null)
   const dispatch = useDispatch()
 
+  const [updateUser, setUpdateUser] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNo: '',
+    address: '',
+    city: '',
+    zipCode: '',
+    profilePic: '',
+    role: 'user',
+    bio: '',
+    country: '',
+    gender: '',
+  })
+  const [file, setFile] = useState(null)
+  const [orders, setOrders] = useState([])
+
+  // Load user from Redux or localStorage on mount
   useEffect(() => {
-    const fetchOrders = async () => {
-      const accessToken = localStorage.getItem('accessToken')
-      if (!accessToken) return
-
-      try {
-        const res = await axios.get(`${API_BASE_URL}/api/v1/cart/orders`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        })
-
-        if (res.data.success) {
-          setOrders(res.data.orders || [])
+    if (user && user._id) {
+      setDisplayUser(user)
+    } else {
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser)
+          if (parsedUser._id) {
+            setDisplayUser(parsedUser)
+            dispatch(setUser(parsedUser))
+          }
+        } catch (error) {
+          console.error('Failed to parse stored user', error)
         }
-      } catch (error) {
-        console.error('Failed to load user orders', error)
       }
     }
+  }, [user, dispatch])
 
+  // Update form when displayUser changes
+  useEffect(() => {
+    if (displayUser) {
+      setUpdateUser({
+        firstName: displayUser?.firstName || '',
+        lastName: displayUser?.lastName || '',
+        email: displayUser?.email || '',
+        phoneNo: displayUser?.phoneNo || '',
+        address: displayUser?.address || '',
+        city: displayUser?.city || '',
+        zipCode: displayUser?.zipCode || '',
+        profilePic: displayUser?.profilePic || displayUser?.profilePicUrl || '',
+        role: displayUser?.role || 'user',
+        bio: displayUser?.bio || '',
+        country: displayUser?.country || '',
+        gender: displayUser?.gender || '',
+      })
+    }
+  }, [displayUser])
+
+  const fetchOrders = async () => {
+    const accessToken = localStorage.getItem('accessToken')
+    if (!accessToken) return
+
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/v1/cart/orders`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      if (res.data.success) {
+        setOrders(res.data.orders || [])
+      }
+    } catch (error) {
+      console.error('Failed to load user orders', error)
+    }
+  }
+
+  useEffect(() => {
     fetchOrders()
-  }, [])
+  }, [displayUser])
 
   const handleChange = (e) => {
-    setUpdateUser({ ...updateUser, [e.target.name]: e.target.value })
+    setUpdateUser((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0]
@@ -71,41 +108,57 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (!displayUser || !displayUser._id) {
+      toast.error('User profile not loaded. Please refresh the page and try again.')
+      return
+    }
+
     const accessToken = localStorage.getItem('accessToken')
+    if (!accessToken) {
+      toast.error('Authentication token missing. Please login again.')
+      return
+    }
+
     try {
       //use formData for text+file
       const formData = new FormData()
       formData.append('firstName', updateUser.firstName)
       formData.append('lastName', updateUser.lastName)
-      formData.append('email', updateUser.email)
       formData.append('phoneNo', updateUser.phoneNo)
       formData.append('address', updateUser.address)
       formData.append('city', updateUser.city)
       formData.append('zipCode', updateUser.zipCode)
-      formData.append('role', updateUser.role)
+      formData.append('bio', updateUser.bio || '')
+      formData.append('country', updateUser.country || '')
+      formData.append('gender', updateUser.gender || '')
 
       if (file) {
-        formData.append("file", file) //image file for backend muler
+        formData.append("file", file) //image file for backend multer
       }
+
       const res = await axios.put(
-        `${API_BASE_URL}/api/v1/user/update/${user._id}`,
+        `${API_BASE_URL}/api/v1/user/update/${displayUser._id}`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
           }
         }
       )
 
-
       if (res.data.success) {
-        toast.success(res.data.message)
-        dispatch(setUser(res.data, user))
+        const updatedUser = res.data.user || { ...displayUser, ...updateUser }
+        setDisplayUser(updatedUser)
+        dispatch(setUser(updatedUser))
+        localStorage.setItem('user', JSON.stringify(updatedUser))
+        toast.success(res.data.message || 'Profile updated successfully')
+      } else {
+        toast.error(res.data.message || 'Failed to update profile')
       }
-    } catch {
-      toast.error("Failed to update profile")
-
-
+    } catch (error) {
+      console.error('Profile update failed', error)
+      toast.error(error?.response?.data?.message || 'Failed to update profile')
     }
 
   }
@@ -172,6 +225,27 @@ const Profile = () => {
                         onChange={handleChange} type='text' placeholder='Enter your zipcode' name='zipCode' />
                     </div>
                   </div>
+                  <div className='grid gap-3 sm:grid-cols-2'>
+                    <div>
+                      <label className='text-sm font-medium text-gray-700'>Country</label>
+                      <input className='mt-1 w-full rounded-lg border px-3 py-2 text-sm' value={updateUser.country || ''}
+                        onChange={handleChange} type='text' placeholder='Enter your country' name='country' />
+                    </div>
+                    <div>
+                      <label className='text-sm font-medium text-gray-700'>Gender</label>
+                      <select className='mt-1 w-full rounded-lg border px-3 py-2 text-sm' value={updateUser.gender || ''} onChange={handleChange} name='gender'>
+                        <option value=''>Select</option>
+                        <option value='Male'>Male</option>
+                        <option value='Female'>Female</option>
+                        <option value='Other'>Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className='text-sm font-medium text-gray-700'>Bio</label>
+                    <textarea className='mt-1 w-full rounded-lg border px-3 py-2 text-sm' rows='3' value={updateUser.bio || ''}
+                      onChange={handleChange} placeholder='Tell us a bit about yourself' name='bio' />
+                  </div>
 
                   <button type="submit" className='mt-2 w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700'>Update Profile</button>
                 </form>
@@ -199,7 +273,7 @@ const Profile = () => {
                   <div key={order._id || index} className='rounded-xl border border-gray-200 p-4'>
                     <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
                       <div>
-                        <p className='font-semibold text-gray-800'>{order._id || `Order ${index + 1}`}</p>
+                        <p className='font-semibold overflow-hidden text-[23px] text-gray-800'>{order._id || `Order ${index + 1}`}</p>
                         <p className='text-sm text-gray-500'>{new Date(order.createdAt).toLocaleString()}</p>
                       </div>
                       <div className='flex items-center gap-2'>

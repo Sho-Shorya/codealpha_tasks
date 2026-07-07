@@ -21,15 +21,22 @@ const Cart = () => {
   const accessToken = localStorage.getItem('accessToken')
 
   const getProductImageUrl = (item) => {
-    const candidates = [
-      item?.productId?.productImg?.[0]?.url,
-      item?.productImg?.[0]?.url,
-      item?.productId?.image,
-      item?.image,
-      item?.productId?.productImg?.[0],
-    ]
-
-    return candidates.find(Boolean)
+    // Primary source: populated productId with productImg array
+    if (item?.productId?.productImg?.[0]?.url) {
+      return item.productId.productImg[0].url
+    }
+    // Fallback for direct productImg structure
+    if (item?.productImg?.[0]?.url) {
+      return item.productImg[0].url
+    }
+    // Fallback for old image format
+    if (item?.productId?.image) {
+      return item.productId.image
+    }
+    if (item?.image) {
+      return item.image
+    }
+    return null
   }
 
   const syncCart = (newCart) => {
@@ -182,9 +189,9 @@ const Cart = () => {
               return (
                 <div key={productId} className='rounded-3xl border bg-white p-4 shadow-sm sm:p-5'>
                   <div className='flex flex-col gap-4 lg:flex-row'>
-                    <div className='h-28 w-full overflow-hidden rounded-2xl bg-gray-100 sm:h-36 sm:w-44'>
+                    <div className='h-30 w-full rounded-2xl bg-gray-100 sm:h-36 sm:w-44'>
                       {imageUrl ? (
-                        <img src={imageUrl} alt={item.productId?.productName || 'Cart item'} className='h-full w-full object-cover' />
+                        <img src={imageUrl} alt={item.productId?.productName || 'Cart item'} className='h-full w-full object-scale-down' />
                       ) : (
                         <div className='flex h-full w-full items-center justify-center bg-gray-200 text-sm text-gray-500'>No image</div>
                       )}

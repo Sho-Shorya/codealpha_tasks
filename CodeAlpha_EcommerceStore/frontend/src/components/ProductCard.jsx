@@ -14,6 +14,7 @@ const ProductCard = ({ product, loading }) => {
     const accessToken = localStorage.getItem('accessToken')
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const [isAdding, setIsAdding] = React.useState(false)
 
     const addToCart = async(productId)=>{
         if (!accessToken) {
@@ -21,6 +22,7 @@ const ProductCard = ({ product, loading }) => {
             navigate('/login');
             return;
         }
+        setIsAdding(true)
         try {
             const res = await axios.post(`${API_BASE_URL}/api/v1/cart/add-cart`, { productId }, {
                 headers: {
@@ -37,6 +39,8 @@ const ProductCard = ({ product, loading }) => {
         } catch (error) {
             console.error(error)
             toast.error(error.response?.data?.message || 'Failed to add product to cart')
+        } finally {
+            setIsAdding(false)
         }
     }
     return (
@@ -60,7 +64,18 @@ const ProductCard = ({ product, loading }) => {
                         <h2 className='text-lg font-bold text-emerald-700'>
                             ₹{productPrice}
                         </h2>
-                        <Button onClick={()=> (addToCart(product._id))} className='mt-auto flex w-full items-center justify-center gap-2 rounded-lg bg-pink-600 py-2 text-sm font-medium sm:py-2.5'><ShoppingCart className='h-4 w-4' />Add to Cart</Button>
+                        <Button 
+                            onClick={()=> (addToCart(product._id))} 
+                            disabled={isAdding}
+                            className={`mt-auto flex w-full items-center justify-center gap-2 rounded-lg bg-pink-600 py-2 text-sm font-medium sm:py-2.5 transition-all duration-300 ${
+                                isAdding ? 'opacity-75 scale-95 animate-pulse' : 'hover:scale-105 active:scale-95'
+                            }`}
+                        >
+                            <ShoppingCart className={`h-4 w-4 transition-transform ${
+                                isAdding ? 'animate-bounce' : ''
+                            }`} />
+                            {isAdding ? 'Adding...' : 'Add to Cart'}
+                        </Button>
                     </div>
             }
         </div>
