@@ -1,6 +1,5 @@
 import { User } from "../models/userModel.js"
 import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
 import { generateToken } from "../config/token.js"
 
 export const register = async (req, res) => {
@@ -92,12 +91,6 @@ export const login = async (req, res) => {
 
     //sign token 
     const token = await generateToken(userId)
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 10 * 365 * 24 * 60 * 60 * 1000,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none"
-    })
 
     //save in db
     existingUser.token = token
@@ -107,8 +100,21 @@ export const login = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: `Welcome back ${existingUser.name}`,
-      user: existingUser,
-      token
+      user: {
+        _id: existingUser._id,
+        name: existingUser.name,
+        userName: existingUser.userName,
+        email: existingUser.email,
+        profilePic: existingUser.profilePic,
+        bio: existingUser.bio,
+        gender: existingUser.gender,
+        country: existingUser.country,
+        followers: existingUser.followers,
+        following: existingUser.following,
+        posts: existingUser.posts,
+        saved: existingUser.saved,
+      },
+      token,
     })
   } catch (error) {
     return res.status(500).json({
@@ -120,11 +126,7 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: false,
-      sameSite: "Strict"
-    })
+    res.clearCookie("token")
 
     const userId = req.userId || (req.user && req.user._id)
     if (userId) {
@@ -171,7 +173,7 @@ export const getUserById = async (req, res) => {
   try {
     const userId = req.params.userId || req.params.id
     // extracting user ID from request params (supports both :userId and :id)
-    const user = await User.findById(userId).select("-password -otp -otpExpiry -token")
+    const user = await User.findById(userId).select("-password -token")
     if (!user) {
       return res.status(404).json({
         success: false,
