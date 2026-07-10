@@ -10,12 +10,17 @@ const Nav = () => {
   const { userData, suggestedUsers } = useSelector(state => state.user)
   return (
     < div className='w-[90%] lg:w-[30%] h-[70px] bg-black flex justify-around items-center fixed bottom-[20px] rounded-full shadow-2xl shadow-[#000000] z-[100]' >
-      <div><GoHomeFill className='text-white w-[25px] h-[25px] cursor-pointer' /></div>
-      <div><FiSearch className='text-white w-[25px] h-[25px] cursor-pointer' /></div>
-      <div><FiPlusSquare className='text-white w-[25px] h-[25px] cursor-pointer' /></div>
+
+      <div onClick={() => navigate('/')} className='cursor-pointer hover:bg-gray-800 rounded-full p-4'><GoHomeFill className='text-white w-[25px] h-[25px] cursor-pointer' /></div>
+
+      <div className='cursor-pointer hover:bg-gray-800 rounded-full p-4'><FiSearch className='text-white w-[25px] h-[25px] cursor-pointer' /></div>
+
+      <div onClick={() => navigate('/upload')} className='cursor-pointer hover:bg-gray-800 rounded-full p-4' ><FiPlusSquare className='text-white w-[25px] h-[25px] cursor-pointer ' /></div>
+      
+      <div className='cursor-pointer hover:bg-gray-800 rounded-full p-2'>
       <div className='w-[40px] h-[40px] border-2 border-black rounded-full cursor-pointer overflow-hidden'>
-        <img onClick={()=>{navigate(`/profile/${userData.userName}`)}} src={userData.profileImage ? userData.profileImage : "/empty_dp.jpg"} className='w-full object-cover' />
-      </div>
+        <img onClick={() => { navigate(`/profile/${userData.userName}`) }} src={userData.profileImage || "/empty_dp.jpg"} className='w-full object-cover' />
+      </div></div>
     </div >
   )
 }

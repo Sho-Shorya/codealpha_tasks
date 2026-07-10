@@ -10,7 +10,9 @@ import { store } from './redux/store.js'
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <Provider store={store}>
+      <div className='h-full overflow-y-auto hide-scrollbar'>
       <App />
+      </div>
       <Toaster richColors position='top-right' />
     </Provider> 
   </BrowserRouter>,

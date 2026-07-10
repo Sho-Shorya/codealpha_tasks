@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../lib/constants';
 import { setProfileData, setUserData } from '../redux/userSlice';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 const EditProfile = () => {
   const dispatch = useDispatch()
@@ -39,13 +40,22 @@ const EditProfile = () => {
       if (backendImage) {
         formdata.append("profileImage", backendImage)
       }
-      const result = await axios.post(`${API_BASE_URL}/api/user/editProfile`, formdata, { withCredentials: true })
+      const token = localStorage.getItem('token')
+      console.log("token " + token);
+
+      const result = await axios.post(`${API_BASE_URL}/api/user/editProfile`, formdata, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
       dispatch(setProfileData(result.data))
       dispatch(setUserData(result.data))
-      navigate(`/profile/${userData.userName}`)
+      navigate('/')
+      window.location.reload();
     } catch (error) {
-        console.log(error);
-    } finally{
+      console.log(error);
+    } finally {
+      toast.success("Profile Saved Successfully")
       setLoading(false)
     }
   }

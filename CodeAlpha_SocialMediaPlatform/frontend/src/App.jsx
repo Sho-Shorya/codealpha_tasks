@@ -7,6 +7,7 @@ import getCurrentUser from './hooks/getCurrentUser.jsx'
 import getSuggestedUsers from './hooks/getSuggestedUser.jsx'
 import Profile from './pages/Profile.jsx'
 import EditProfile from './pages/EditProfile.jsx'
+import Upload from './pages/Upload.jsx'
 
 function App() {
   getCurrentUser();
@@ -19,6 +20,7 @@ function App() {
       <Route path='/' element={userData ? <Home /> : <Navigate to={'/login'}/>} />
       <Route path='/profile/:userName' element={userData ? <Profile /> : <Navigate to={'/login'}/>} />
       <Route path='/editProfile' element={userData ? <EditProfile /> : <Navigate to={'/login'}/>} />
+      <Route path='/upload' element={userData ? <Upload /> : <Navigate to={'/login'}/>} />
     </Routes>
   )
 }

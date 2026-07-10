@@ -152,7 +152,7 @@ export const logout = async (req, res) => {
 export const getCurrentUser = async (req, res) => {
   try {
     const userId = req.userId
-    const user = await User.findById(userId)
+    const user = await User.findById(userId).populate("posts")
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -174,7 +174,7 @@ export const getProfile = async (req, res) => {
   try {
     const userName = req.params.userName
     // extracting user ID from request params (supports both :userId and :id)
-    const user = await User.findOne({userName}).select("-password")
+    const user = await User.findOne({ userName }).select("-password")
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -211,12 +211,13 @@ export const editProfile = async (req, res) => {
       })
     }
 
-    // use the fields that actually exist on the model
-    let profilePic = user.profilePic || ""
 
     const fileToUpload = req.file || (Array.isArray(req.files) && req.files.length === 1 && req.files[0])
     if (fileToUpload) {
-      const profilePic = await uploadToCloudinary(req.file.path)
+      if (profilePic) {
+
+        const profilePic = await uploadToCloudinary(req.file.path)
+      }
     }
 
     user.name = name || user.name
@@ -224,7 +225,6 @@ export const editProfile = async (req, res) => {
     user.bio = bio || user.bio
     user.country = country || user.country
     user.gender = gender || user.gender
-    user.profilePic = profilePic
 
     await user.save()
 
