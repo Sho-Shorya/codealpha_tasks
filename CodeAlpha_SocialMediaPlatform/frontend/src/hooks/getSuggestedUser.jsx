@@ -2,29 +2,30 @@ import React from 'react'
 import axios from 'axios'
 import { useEffect } from 'react'
 import { API_BASE_URL } from '../lib/constants'
-import { useDispatch } from 'react-redux'
-import { setUserData } from '../redux/userSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { setSuggestedUsers } from '../redux/userSlice'
 
-const getCurrentUser = () => {
+const getSuggestedUsers = () => {
   const dispatch = useDispatch()
+  const { userData } = useSelector(state => state.user)
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await axios.get(`${API_BASE_URL}/api/user/current`, {
+        const res = await axios.get(`${API_BASE_URL}/api/user/suggested`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        dispatch(setUserData(res.data.user))
+        dispatch(setSuggestedUsers(res.data.users))
       } catch (error) {
         console.log(error)
       }
     }
     fetchUser()
-  }, [dispatch])
+  }, [userData])
 }
 
-export default getCurrentUser
+export default getSuggestedUsers

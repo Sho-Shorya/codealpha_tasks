@@ -1,6 +1,7 @@
 import { User } from "../models/userModel.js"
 import bcrypt from "bcryptjs"
 import { generateToken } from "../config/token.js"
+import uploadToCloudinary from "../config/cloudinary.js";
 
 export const register = async (req, res) => {
   try {
@@ -169,11 +170,11 @@ export const getCurrentUser = async (req, res) => {
     })
   }
 }
-export const getUserById = async (req, res) => {
+export const getProfile = async (req, res) => {
   try {
-    const userId = req.params.userId || req.params.id
+    const userName = req.params.userName
     // extracting user ID from request params (supports both :userId and :id)
-    const user = await User.findById(userId).select("-password -token")
+    const user = await User.findOne({userName}).select("-password")
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -192,87 +193,46 @@ export const getUserById = async (req, res) => {
   }
 }
 
-export const updateUser = async (req, res) => {
+export const editProfile = async (req, res) => {
   try {
-    const userIdToUpdate = req.params.userId
-    //the id of the user we want to update
-    const loggedInUser = req.user //from isAuthenticated middleware
-
-    // Validate that userIdToUpdate is provided and not "undefined"
-    if (!userIdToUpdate || userIdToUpdate === 'undefined') {
-      return res.status(400).json({
-        success: false,
-        message: "User ID is required for profile update"
-      })
-    }
-
-    const { firstName, lastName, address, city, zipCode, phoneNo, role, bio, country, gender } = req.body
-
-    if (loggedInUser._id.toString() !== userIdToUpdate && loggedInUser.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: "You are not allowed to update this profile"
-      })
-    }
-    let user = await User.findById(userIdToUpdate)
+    const { name, userName, bio, country, gender } = req.body
+    let user = await User.findById(req.userId).select("-password")
     if (!user) {
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
         message: "User not found!"
       })
     }
-    // use the fields that actually exist on the model
-    let profilePicUrl = user.profilePic || ""
-    let profilePicPublicId = user.profilePicPublicId || ""
-
-    // if files are present, enforce a single-file upload for profile updates
-    if (Array.isArray(req.files) && req.files.length > 1) {
-      return res.status(400).json({ success: false, message: "Only one file allowed for profile update" })
+    const sameUserWithUserName = await User.findOne({ userName }).select('-password')
+    if (sameUserWithUserName && sameUserWithUserName._id != req.userId) {
+      return res.status(400).json({
+        success: false,
+        message: "UserName Already exists"
+      })
     }
-    // accept either req.file (single) or the single element in req.files
+
+    // use the fields that actually exist on the model
+    let profilePic = user.profilePic || ""
+
     const fileToUpload = req.file || (Array.isArray(req.files) && req.files.length === 1 && req.files[0])
     if (fileToUpload) {
-      if (profilePicPublicId) {
-        await cloudinary.uploader.destroy(profilePicPublicId)
-      }
-
-      const uploadResult = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "profile" },
-          (error, result) => {
-            if (error) reject(error)
-            else resolve(result)
-          }
-        )
-
-        stream.end(fileToUpload.buffer)
-      })
-
-      profilePicUrl = uploadResult.secure_url
-      profilePicPublicId = uploadResult.public_id
+      const profilePic = await uploadToCloudinary(req.file.path)
     }
 
-    user.firstName = firstName || user.firstName
-    user.lastName = lastName || user.lastName
-    user.address = address || user.address
-    user.city = city || user.city
-    user.zipCode = zipCode || user.zipCode
-    user.phoneNo = phoneNo || user.phoneNo
-    user.role = role || user.role
-    user.bio = bio !== undefined ? bio : user.bio
-    user.country = country !== undefined ? country : user.country
-    user.gender = gender !== undefined ? gender : user.gender
-    user.profilePic = profilePicUrl
-    user.profilePicPublicId = profilePicPublicId
+    user.name = name || user.name
+    user.userName = userName || user.userName
+    user.bio = bio || user.bio
+    user.country = country || user.country
+    user.gender = gender || user.gender
+    user.profilePic = profilePic
 
-    const updatedUser = await user.save()
+    await user.save()
 
     return res.status(200).json({
       success: true,
       message: "Profile Updated Successfully",
-      user: updatedUser
+      user
     })
-
   } catch (error) {
     console.error("Profile update error:", error.message)
     return res.status(500).json({
@@ -280,6 +240,21 @@ export const updateUser = async (req, res) => {
       message: error.message
     })
   }
-
 }
 
+export const suggestedUsers = async (req, res) => {
+  try {
+    const users = await User.find({
+      _id: { $ne: req.userId }
+    }).select("-password")
+    return res.status(200).json({
+      success: true,
+      users
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}

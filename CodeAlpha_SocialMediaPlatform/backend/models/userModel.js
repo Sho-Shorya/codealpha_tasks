@@ -6,7 +6,6 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, },
   profilePic: { type: String, default: "" }, //Clouduinary image url
-  profilePicPublicId: { type: String, default: "" }, //Clouduinary Public ID for deletion
   followers: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
@@ -28,6 +27,7 @@ const userSchema = new mongoose.Schema({
   }],
   bio: { type: String, default: '' },
   gender: { type: String, default: '' },
+  profession: { type: String, default: '' },
   country: { type: String, default: '' },
   isLoggedIn: { type: Boolean, default: false },
   token: { type: String, default: null }

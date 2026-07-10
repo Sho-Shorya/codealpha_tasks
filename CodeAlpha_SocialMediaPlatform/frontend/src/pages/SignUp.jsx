@@ -40,7 +40,6 @@ function SignUp() {
       if (res.data.success) {
         navigate('/login')
         toast.success(res.data.message);
-        dispatch(setUserData(res.data.user))
       } else (
         console.log("Registration failed")
       )
