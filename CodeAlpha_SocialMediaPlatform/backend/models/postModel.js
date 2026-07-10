@@ -6,7 +6,7 @@ const postSchema = mongoose.Schema({
     ref: 'user',
     required: true
   },
-  modiaType: {
+  mediaType: {
     type: String,
     enum: ['image', 'video'],
     required: true
@@ -24,7 +24,7 @@ const postSchema = mongoose.Schema({
       ref: 'user'
     },
     message:{
-      type:String 
+      type:String
     }
   }],
   comments: [{

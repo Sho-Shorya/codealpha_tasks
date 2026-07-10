@@ -17,12 +17,7 @@ export default function UploadMedia() {
   const [backendMedia, setBackendMedia] = useState()
   const [caption, setCaption] = useState('')
 
-  useEffect(() => {
-  return () => {
-    if (frontendMedia) URL.revokeObjectURL(frontendMedia);
-  };
 
-}, [frontendMedia]);
   const handleFiles = (file) => {
     const uploadedfile = file[0]
     if (file && file.length > 0) {
@@ -32,36 +27,36 @@ export default function UploadMedia() {
         setMediaType('image')
         setBackendMedia(uploadedfile)
         setFrontendMedia(URL.createObjectURL(uploadedfile))
-        console.log(backendMedia);
-        console.log(frontendMedia);
 
       } else (
         toast.error('Please upload an Image')
       )
     }
   };
-
+  
   const upload = async () => {
     try {
+      console.log(backendMedia+"no");
+      console.log(frontendMedia);
       const formData = new FormData()
       const token = localStorage.getItem('token')
       console.log(token);
 
       formData.append('caption', caption)
       formData.append('mediaType', mediaType)
-      formData.append('media', backendMedia)
+      formData.append('media', frontendMedia)
       const result = await axios.post(`${API_BASE_URL}/api/post/upload`, formData, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
       })
-      console.log(result);
-      
-      
+      console.log(result+"result");
+
+
 
     } catch (error) {
       console.log(error);
-      
+
     }
   }
 
