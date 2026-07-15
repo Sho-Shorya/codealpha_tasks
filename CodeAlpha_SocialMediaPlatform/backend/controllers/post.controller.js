@@ -15,11 +15,12 @@ export const uploadPost = async (req, res) => {
       caption, media, mediaType, author: req.userId
     })
     const user = await User.findById(req.userId)
-    user.posts.push(post_.id)
+    user.posts.push(post._id)
     await user.save()
     const populatedPost = await Post.findById(post._id).populate("author", "name userName profilePic")
     return res.status(200).json(populatedPost)
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: `upload post error ${error}` })
   }
 }
@@ -69,7 +70,7 @@ export const comment = async (req, res) => {
     })
     await post.save()
     post.populate("author", "name userName profilePic"),
-    post.populate("comments.author")
+      post.populate("comments.author")
     return res.status(200).json(post)
 
   } catch (error) {

@@ -17,7 +17,11 @@ function Profile() {
   const { profileData } = useSelector(state => state.user)
   const handleProfile = async () => {
     try {
-      const result = await axios.get(`${API_BASE_URL}/api/user/profile/${userName}`, { withCredentials: true })
+      const result = await axios.get(`${API_BASE_URL}/api/user/profile/${userName}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
       dispatch(setProfileData(result.data))
     } catch (error) {
       console.log(error);
@@ -79,14 +83,14 @@ function Profile() {
         {/* stats */}
         <div className='flex gap-[40px] mt-[20px]'>
           <div className='flex flex-col items-center'>
-            <div className='text-white font-semibold text-[16px]'>{profileData?.posts?.length || 0}</div>
+            <div className='text-white font-semibold text-[16px]'>{profileData?.user?.posts?.length || 0}</div>
             <div className='text-gray-400 text-[13px]'>Posts</div>
           </div>
 
           <div className='flex flex-col items-center'>
             <div className='flex items-center gap-[4px]'>
               <HiUserGroup className='text-white' size={16} />
-              <div className='text-white font-semibold text-[16px]'>{profileData?.followers?.length || 0}</div>
+              <div className='text-white font-semibold text-[16px]'>{profileData?.user?.followers?.length || 0}</div>
             </div>
             <div className='text-gray-400 text-[13px]'>Followers</div>
           </div>
@@ -94,7 +98,7 @@ function Profile() {
           <div className='flex flex-col items-center'>
             <div className='flex items-center gap-[4px]'>
               <HiUserGroup className='text-white' size={16} />
-              <div className='text-white font-semibold text-[16px]'>{profileData?.following?.length || 0}</div>
+              <div className='text-white font-semibold text-[16px]'>{profileData?.user?.following?.length || 0}</div>
             </div>
             <div className='text-gray-400 text-[13px]'>Following</div>
           </div>
@@ -104,7 +108,7 @@ function Profile() {
         <div>
           {profileData?.user?._id == userData?._id && <button
             className='mt-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'
-            onClick={() => navigate('/editProfile')}
+            onClick={() => navigate('/editprofile')}
           >
             Edit Profile
           </button>}
@@ -118,7 +122,7 @@ function Profile() {
         </div>
       </div>
 
-      
+
       {/* posts section */}
       <div className='md:w-[75%] min-h-screen flex'>
         <div className='w-full min-h-screen flex justify-center bg-white rounded-t-[60px] md:mt-[0px] sm:mt-[30px] pb-[100px]'>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { useRef } from 'react';
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
@@ -15,7 +15,7 @@ const EditProfile = () => {
   const { userData, profileData } = useSelector(state => state.user)
   const navigate = useNavigate()
   const imageInput = useRef()
-  const [frontedImage, setFrontendImage] = useState(userData.profilePic || '/empty_dp.jpg')
+  const [frontendImage, setFrontendImage] = useState(userData.profilePic || '/empty_dp.jpg')
   const [backendImage, setBackendImage] = useState(null)
   const [name, setName] = useState(userData?.name || "")
   const [userName, setUserName] = useState(userData?.userName || "")
@@ -23,10 +23,22 @@ const EditProfile = () => {
   const [profession, setProfession] = useState(userData?.profession || "")
   const [gender, setGender] = useState(userData?.gender || "")
 
+  useEffect(() => {
+    if (userData) {
+      setFrontendImage(userData.profilePic || "/empty_dp.jpg");
+      setName(userData.name || "");
+      setUserName(userData.userName || "");
+      setBio(userData.bio || "");
+      setProfession(userData.profession || "");
+      setGender(userData.gender || "");
+    }
+  }, [userData]);
+
   const handleImage = async (e) => {
     const file = e.target.files[0]
     setBackendImage(file)
     setFrontendImage(URL.createObjectURL(file))
+
   }
   const handleEditProfile = async () => {
     try {
@@ -38,24 +50,33 @@ const EditProfile = () => {
       formdata.append("profession", profession)
       formdata.append("gender", gender)
       if (backendImage) {
-        formdata.append("profileImage", backendImage)
+        formdata.append("profilePic", backendImage)
       }
-      const token = localStorage.getItem('token')
-      console.log("token " + token);
 
-      const result = await axios.post(`${API_BASE_URL}/api/user/editProfile`, formdata, {
+      const token = localStorage.getItem('token')
+      const result = await axios.post(`${API_BASE_URL}/api/user/editprofile`, formdata, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
       })
-      dispatch(setProfileData(result.data))
-      dispatch(setUserData(result.data))
+
       navigate('/')
-      window.location.reload();
+      dispatch(setProfileData(result.data.user))
+      dispatch(setUserData(result.data.user))
+      toast.success("Profile Saved Successfully")
+      // window.location.reload();
     } catch (error) {
+      if (
+        error.response &&
+        error.response.status === 400
+      ) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+
       console.log(error);
     } finally {
-      toast.success("Profile Saved Successfully")
       setLoading(false)
     }
   }
@@ -70,7 +91,7 @@ const EditProfile = () => {
         <div onClick={() => imageInput.current.click()}>
           <div className='w-[80px] h-[80px] md:w-[130px] md:h-[130px] rounded-full overflow-hidden border-2 border-gray-700 mt-[30px]'>
             <input type='file' onChange={handleImage} accept='image/*' ref={imageInput} hidden />
-            <img src={frontedImage} alt="" className='w-full h-full object-cover' />
+            <img src={frontendImage || userData.profilePic} alt="" className='w-full h-full object-cover' />
           </div>
           <h1 className='text-blue-600 text-[15px] mt-2'>Change your profile pic</h1>
         </div>
@@ -122,7 +143,7 @@ const EditProfile = () => {
           className='w-[60%] text-[black] text-[18px] font-semibold max-w-[500px] h-[50px] bg-white rounded-full flex items-center justify-center font-semibold cursor-pointer mt-[30px] mb-[40px]'
           onClick={handleEditProfile}
         >
-          {loading ? "Updating" : "Save Profile"}
+          {loading ? "Saving..." : "Save Profile"}
         </div>
       </div>
 

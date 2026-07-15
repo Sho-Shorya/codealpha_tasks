@@ -17,7 +17,7 @@ function SignUp() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
+    setForm((prev) => ({ 
       ...prev,
       [name]: value
     }))

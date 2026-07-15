@@ -7,56 +7,58 @@ import axios from "axios";
 import { API_BASE_URL } from "../lib/constants";
 import { useEffect } from "react";
 
-export default function UploadMedia() {
+function Upload() {
 
   const [isDragging, setIsDragging] = useState(false);
-  const [fileName, setFileName] = useState(null);
+  const [fileName, setFileName] = useState('');
   const navigate = useNavigate()
   const [mediaType, setMediaType] = useState('')
-  const [frontendMedia, setFrontendMedia] = useState()
-  const [backendMedia, setBackendMedia] = useState()
+  const [frontendMedia, setFrontendMedia] = useState(null)
+  const [backendMedia, setBackendMedia] = useState(null)
   const [caption, setCaption] = useState('')
 
 
   const handleFiles = (file) => {
-    const uploadedfile = file[0]
+    const uploadedFile = file[0];
     if (file && file.length > 0) {
-      setFileName(uploadedfile.name);
-      console.log(uploadedfile);
-      if (uploadedfile.type.includes('image')) {
-        setMediaType('image')
-        setBackendMedia(uploadedfile)
-        setFrontendMedia(URL.createObjectURL(uploadedfile))
+      setFileName(uploadedFile.name);
 
-      } else (
+      if (uploadedFile.type.includes('image')) {
+
+        setMediaType('image')
+        setBackendMedia(uploadedFile)
+        setFrontendMedia(URL.createObjectURL(uploadedFile))
+        
+      } else {
         toast.error('Please upload an Image')
-      )
+      }
     }
   };
-  
+
   const upload = async () => {
     try {
-      console.log(backendMedia+"no");
-      console.log(frontendMedia);
       const formData = new FormData()
-      const token = localStorage.getItem('token')
-      console.log(token);
-
+  
       formData.append('caption', caption)
       formData.append('mediaType', mediaType)
-      formData.append('media', frontendMedia)
-      const result = await axios.post(`${API_BASE_URL}/api/post/upload`, formData, {
+      formData.append('media', backendMedia)
+      
+      for (const pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+      
+      const token = localStorage.getItem('token')
+      const res = await axios.post(`${API_BASE_URL}/api/post/upload`,formData ,{
         headers: {
-          "Authorization": `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       })
-      console.log(result+"result");
-
-
+      navigate('/')
+      toast.success('Media uploaded successfully')
 
     } catch (error) {
+      toast.error('Failed to upload media')
       console.log(error);
-
     }
   }
 
@@ -74,7 +76,7 @@ export default function UploadMedia() {
       <div className="w-full max-w-md mx-auto mb-8 rounded-xl h-20 bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 flex items-center px-5 shadow-lg shadow-purple-900/40">
         <div>
           <p className="text-sm font-semibold leading-tight">Share something new</p>
-          <p className="text-xs text-white/80 leading-tight">
+          <p className="text-xs text-white/80 leading-tight"> 
             Upload picture
           </p>
         </div>
@@ -147,3 +149,5 @@ export default function UploadMedia() {
     </div>
   );
 }
+
+export default Upload;

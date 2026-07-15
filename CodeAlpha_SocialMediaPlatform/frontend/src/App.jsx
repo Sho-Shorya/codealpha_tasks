@@ -19,7 +19,7 @@ function App() {
       <Route path='/login' element={!userData ? <Login /> :  <Navigate to={'/'}/>}/>
       <Route path='/' element={userData ? <Home /> : <Navigate to={'/login'}/>} />
       <Route path='/profile/:userName' element={userData ? <Profile /> : <Navigate to={'/login'}/>} />
-      <Route path='/editProfile' element={userData ? <EditProfile /> : <Navigate to={'/login'}/>} />
+      <Route path='/editprofile' element={userData ? <EditProfile /> : <Navigate to={'/login'}/>} />
       <Route path='/upload' element={userData ? <Upload /> : <Navigate to={'/login'}/>} />
     </Routes>
   )

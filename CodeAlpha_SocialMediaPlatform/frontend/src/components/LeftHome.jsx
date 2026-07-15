@@ -42,8 +42,8 @@ const LeftHome = () => {
       </div>
       <div className='mx-5 my-3 flex items-center justify-between border-b-2 border-b-gray-900 py-2'>
         <div className='flex items-center gap-[10px]'>
-          <div className='w-[60px] h-[60px] border-2 border-black rounded-full cursor-pointer overflow-hidden'>
-            <img src={userData.profileImage ? userData.profileImage : "/empty_dp.jpg"} className='w-full object-cover' />
+          <div className='w-[60px] h-[60px] border-2 border-black rounded-full cursor-pointer border-1 border-gray-900 overflow-hidden'>
+            <img src={userData.profilePic ? userData.profilePic : "/empty_dp.jpg"} className='w-full h-full object-cover' />
           </div>
           <div>
             <div className='text-[18px]'>{userData.userName}</div>

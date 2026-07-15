@@ -195,7 +195,7 @@ export const getProfile = async (req, res) => {
 
 export const editProfile = async (req, res) => {
   try {
-    const { name, userName, bio, country, gender } = req.body
+    const { name, userName, bio, country, gender, profession, profilePic } = req.body
     let user = await User.findById(req.userId).select("-password")
     if (!user) {
       return res.status(400).json({
@@ -204,27 +204,26 @@ export const editProfile = async (req, res) => {
       })
     }
     const sameUserWithUserName = await User.findOne({ userName }).select('-password')
-    if (sameUserWithUserName && sameUserWithUserName._id != req.userId) {
+    if (sameUserWithUserName && !sameUserWithUserName._id.equals(req.userId)) {
       return res.status(400).json({
         success: false,
         message: "UserName Already exists"
       })
     }
 
+    let uploadedProfilePic = user.profilePic;
 
-    const fileToUpload = req.file || (Array.isArray(req.files) && req.files.length === 1 && req.files[0])
-    if (fileToUpload) {
-      if (profilePic) {
-
-        const profilePic = await uploadToCloudinary(req.file.path)
-      }
+    if (req.file) {
+      uploadedProfilePic = await uploadToCloudinary(req.file.path);
     }
-
+    user.profilePic = uploadedProfilePic;
     user.name = name || user.name
     user.userName = userName || user.userName
     user.bio = bio || user.bio
+    user.profession = profession || user.profession
     user.country = country || user.country
     user.gender = gender || user.gender
+    user.profilePic = profilePic || user.profilePic
 
     await user.save()
 

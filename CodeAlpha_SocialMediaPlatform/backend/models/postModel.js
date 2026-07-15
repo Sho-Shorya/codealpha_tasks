@@ -3,7 +3,7 @@ import mongoose, { mongo } from "mongoose";
 const postSchema = mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
     required: true
   },
   mediaType: {
@@ -21,7 +21,7 @@ const postSchema = mongoose.Schema({
   likes: [{
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'user'
+      ref: 'User'
     },
     message:{
       type:String
@@ -29,7 +29,7 @@ const postSchema = mongoose.Schema({
   }],
   comments: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user'
+    ref: 'User'
   }],
 }, { timestamps: true })
 

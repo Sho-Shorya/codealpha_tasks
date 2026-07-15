@@ -17,9 +17,9 @@ const Nav = () => {
 
       <div onClick={() => navigate('/upload')} className='cursor-pointer hover:bg-gray-800 rounded-full p-4' ><FiPlusSquare className='text-white w-[25px] h-[25px] cursor-pointer ' /></div>
       
-      <div className='cursor-pointer hover:bg-gray-800 rounded-full p-2'>
-      <div className='w-[40px] h-[40px] border-2 border-black rounded-full cursor-pointer overflow-hidden'>
-        <img onClick={() => { navigate(`/profile/${userData.userName}`) }} src={userData.profileImage || "/empty_dp.jpg"} className='w-full object-cover' />
+      <div onClick={() => { navigate(`/profile/${userData.userName}`) }} className='cursor-pointer hover:bg-gray-800 rounded-full p-2'>
+      <div  className='w-[40px] h-[40px] border-2 border-black rounded-full cursor-pointer overflow-hidden'>
+        <img src={userData.profilePic || "/empty_dp.jpg"} className='w-full h-full object-cover' />
       </div></div>
     </div >
   )
