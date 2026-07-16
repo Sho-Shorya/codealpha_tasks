@@ -27,6 +27,21 @@ export const uploadPost = async (req, res) => {
 
 export const getAllPost = async (req, res) => {
   try {
+    const posts = await Post.find()
+      .populate("author", "name userName profilePic")
+      .sort({ createdAt: -1 }); // newest first
+
+    return res.status(200).json(posts);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: `Get all posts error: ${error.message}`,
+    });
+  }
+};
+
+export const getUserPost = async (req, res) => {
+  try {
     const posts = await Post.find({ author: req.userId }).populate("author", "name userName profilePic")
     return res.status(200).json(posts)
   } catch (error) {

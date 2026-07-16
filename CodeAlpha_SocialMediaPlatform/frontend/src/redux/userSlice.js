@@ -6,7 +6,7 @@ const userSlice = createSlice({
   initialState: {
     userData: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null,
     suggestedUsers: null,
-    profileData:null 
+    profileData:null
   },
   reducers: {
     setUserData: (state, action) => {

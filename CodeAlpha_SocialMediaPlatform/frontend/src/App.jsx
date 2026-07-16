@@ -8,10 +8,12 @@ import getSuggestedUsers from './hooks/getSuggestedUser.jsx'
 import Profile from './pages/Profile.jsx'
 import EditProfile from './pages/EditProfile.jsx'
 import Upload from './pages/Upload.jsx'
+import getAllPost from './hooks/getAllPost.jsx'
 
 function App() {
   getCurrentUser();
-  getSuggestedUsers()
+  getSuggestedUsers();
+  getAllPost()
   const { userData } = useSelector(state => state.user)
   return (
     <Routes>

@@ -107,7 +107,7 @@ function Profile() {
         {/* edit profile button */}
         <div>
           {profileData?.user?._id == userData?._id && <button
-            className='mt-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'
+            className='my-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'
             onClick={() => navigate('/editprofile')}
           >
             Edit Profile

@@ -6,6 +6,6 @@ import { comment, getAllPost, like, uploadPost } from "../controllers/post.contr
 export const postRouter = express.Router();
 
 postRouter.post('/upload',isAuthenticated, Upload.single("media"), uploadPost) 
-postRouter.get('/getAll',isAuthenticated, getAllPost)
+postRouter.get('/getall',isAuthenticated, getAllPost)
 postRouter.get('/like/:postId',isAuthenticated, like)
 postRouter.post('/comment',isAuthenticated ,comment)
