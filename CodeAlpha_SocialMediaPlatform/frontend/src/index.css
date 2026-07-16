@@ -4,7 +4,7 @@ html,
 body,
 #root {
   height: 100%;
-  color:white
+  color: white
 }
 
 
@@ -12,8 +12,30 @@ body,
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+}
+
+body {
+  overflow-x: hidden;
+
+}
+
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
 }

@@ -52,18 +52,17 @@ const EditProfile = () => {
       if (backendImage) {
         formdata.append("profilePic", backendImage)
       }
-
       const token = localStorage.getItem('token')
       const result = await axios.post(`${API_BASE_URL}/api/user/editprofile`, formdata, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
       })
-
+      
       navigate('/')
       dispatch(setProfileData(result.data.user))
       dispatch(setUserData(result.data.user))
-      toast.success("Profile Saved Successfully")
+      window.location.reload();
       // window.location.reload();
     } catch (error) {
       if (
@@ -77,6 +76,7 @@ const EditProfile = () => {
 
       console.log(error);
     } finally {
+      toast.success("Profile Saved Successfully")
       setLoading(false)
     }
   }
@@ -88,7 +88,7 @@ const EditProfile = () => {
       </div>
 
       <div className='flex flex-col items-center'>
-        <div onClick={() => imageInput.current.click()}>
+        <div className='flex flex-col items-center' onClick={() => imageInput.current.click()}>
           <div className='w-[80px] h-[80px] md:w-[130px] md:h-[130px] rounded-full overflow-hidden border-2 border-gray-700 mt-[30px]'>
             <input type='file' onChange={handleImage} accept='image/*' ref={imageInput} hidden />
             <img src={frontendImage || userData.profilePic} alt="" className='w-full h-full object-cover' />

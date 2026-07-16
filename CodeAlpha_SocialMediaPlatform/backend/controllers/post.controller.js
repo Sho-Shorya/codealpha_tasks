@@ -29,6 +29,7 @@ export const getAllPost = async (req, res) => {
   try {
     const posts = await Post.find()
       .populate("author", "name userName profilePic")
+      .populate("comments.author", "userName profilePic")
       .sort({ createdAt: -1 }); // newest first
 
     return res.status(200).json(posts);
@@ -52,20 +53,21 @@ export const getUserPost = async (req, res) => {
 export const like = async (req, res) => {
   try {
     const postId = req.params.postId
-    const post = Post.findById(postId)
-    if (post) {
-      return res.status(400).json({ message: `post not found` })
+    const selectedPost = await Post.findById(postId)
+
+    if (!selectedPost) {
+      return res.status(400).json({ message: `Post not found` })
     }
-    const alreadyLiked = post.likes.some(id => id.ToString() == req.userId.ToString())
+    const alreadyLiked = selectedPost.likes.some(id => id.toString() == req.userId.toString())
     if (alreadyLiked) {
-      post.likes = post.likes.filter(id => id.ToString() != req.userId.ToString())
+      selectedPost.likes = selectedPost.likes.filter(id => id.toString() != req.userId.toString())
     } else {
-      post.likes.push(req.userId)
+      selectedPost.likes.push(req.userId)
     }
 
-    await post.save()
-    post.populate("author", "name userName profilePic")
-    return res.status(200).json(post)
+    await selectedPost.save()
+    await selectedPost.populate("author", "name userName profilePic")
+    return res.status(200).json(selectedPost)
   } catch (error) {
     return res.status(500).json({ message: `like post error ${error}` })
   }
@@ -75,20 +77,106 @@ export const comment = async (req, res) => {
   try {
     const { message } = req.body
     const postId = req.params.postId
-    const post = Post.findById(postId)
-    if (post) {
-      return res.status(400).json({ message: `post not found` })
+    const commentedPost = await Post.findById(postId)
+    if (!commentedPost) {
+      return res.status(400).json({ message: `Post not found` })
     }
-    post.comments.push({
+    commentedPost.comments.push({
       author: req.userId,
       message
     })
-    await post.save()
-    post.populate("author", "name userName profilePic"),
-      post.populate("comments.author")
-    return res.status(200).json(post)
+    await commentedPost.save()
+    await commentedPost.populate("author", "name userName profilePic");
+    await commentedPost.populate("comments.author", "name userName profilePic");
+    return res.status(200).json(commentedPost)
 
   } catch (error) {
     return res.status(500).json({ message: `Comment error ${error}` })
   }
 }
+
+export const deleteComment = async (req, res) => {
+  try {
+    const { postId, commentId } = req.params;
+
+    const commentUpdatedPost = await Post.findById(postId);
+
+    if (!commentUpdatedPost) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    const comment = commentUpdatedPost.comments.id(commentId);
+
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+    }
+
+    // Only the comment owner can delete
+    if (comment.author._id.toString() !== req.userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+    comment.deleteOne(); // or comment.remove() for older Mongoose versions
+
+    await commentUpdatedPost.save();
+
+    await commentUpdatedPost.populate("author", "name userName profilePic");
+    await commentUpdatedPost.populate("comments.author", "name userName profilePic");
+
+    return res.status(200).json({
+      success: true,
+      message: "Comment deleted successfully",
+      commentUpdatedPost,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+export const deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    // Check ownership
+    if (post.author._id.toString() !== req.userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this post.",
+      });
+    }
+
+    await Post.findByIdAndDelete(postId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Post deleted successfully.",
+      postId,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

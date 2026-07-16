@@ -1,12 +1,14 @@
 import React from 'react'
 import LeftHome from '../components/LeftHome'
 import Feed from '../components/Feed'
+import RightHome from '../components/RightHome'
 
 const home = () => {
   return (
-    <div className='w-full flex justify-center items-start'>
-      <LeftHome/>
-      <Feed/>
+    <div className='w-full flex justify-start items-start'>
+      <LeftHome />
+      <Feed />
+      <RightHome />
     </div>
   )
 }

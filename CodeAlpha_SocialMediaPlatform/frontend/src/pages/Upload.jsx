@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import axios from "axios";
 import { API_BASE_URL } from "../lib/constants";
 import { useEffect } from "react";
+import { fetchPosts } from "../hooks/getAllPost";
+import { useDispatch } from "react-redux";
 
 function Upload() {
 
@@ -16,6 +18,8 @@ function Upload() {
   const [frontendMedia, setFrontendMedia] = useState(null)
   const [backendMedia, setBackendMedia] = useState(null)
   const [caption, setCaption] = useState('')
+  const [loading, setLoading] = useState(false)
+  const dispatch = useDispatch();
 
 
   const handleFiles = (file) => {
@@ -28,7 +32,7 @@ function Upload() {
         setMediaType('image')
         setBackendMedia(uploadedFile)
         setFrontendMedia(URL.createObjectURL(uploadedFile))
-        
+
       } else {
         toast.error('Please upload an Image')
       }
@@ -36,29 +40,35 @@ function Upload() {
   };
 
   const upload = async () => {
+    setLoading(true)
     try {
       const formData = new FormData()
-  
+
       formData.append('caption', caption)
       formData.append('mediaType', mediaType)
       formData.append('media', backendMedia)
-      
+
       for (const pair of formData.entries()) {
         console.log(pair[0], pair[1]);
       }
-      
+
       const token = localStorage.getItem('token')
-      const res = await axios.post(`${API_BASE_URL}/api/post/upload`,formData ,{
+      const res = await axios.post(`${API_BASE_URL}/api/post/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
+      await fetchPosts(dispatch);
+
       navigate('/')
       toast.success('Media uploaded successfully')
 
     } catch (error) {
       toast.error('Failed to upload media')
       console.log(error);
+    } finally {
+      setLoading(false)
+
     }
   }
 
@@ -76,7 +86,7 @@ function Upload() {
       <div className="w-full max-w-md mx-auto mb-8 rounded-xl h-20 bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 flex items-center px-5 shadow-lg shadow-purple-900/40">
         <div>
           <p className="text-sm font-semibold leading-tight">Share something new</p>
-          <p className="text-xs text-white/80 leading-tight"> 
+          <p className="text-xs text-white/80 leading-tight">
             Upload picture
           </p>
         </div>
@@ -133,7 +143,7 @@ function Upload() {
               <div className='w-[100%] max-w-[500px] h-[250px]
             flex flex-col items-center justify-center  mt-[5vh] '>
                 <img src={frontendMedia} alt="" className='h-[80%] rounded-2xl' />
-                <input type='text' onChange={(e) => setCaption(e.target.value)} value={caption} className='w-full ■border-b-gray-400 border-b-2
+                <input type='text' maxLength={150} onChange={(e) => setCaption(e.target.value)} value={caption} className='w-full ■border-b-gray-400 border-b-2
             outline-none px-[10px] py-[5px] ■text-white mt-[20px]'
                   placeholder='write caption' />
               </div>}
@@ -141,7 +151,9 @@ function Upload() {
         {frontendMedia &&
           <button onClick={upload} className="mt-20 px-[10px] w-[50%] max-w-
            [100px]  py-[5px] h-[50px] text-[black] bg-[white] mt-[50px] cursor-pointer
-          rounded-2xl">Upload Post</button>
+          rounded-2xl">
+            {loading ? "Uploading..." : "Upload Post"}
+          </button>
         }
 
 

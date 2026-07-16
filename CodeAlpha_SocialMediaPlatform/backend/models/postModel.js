@@ -18,7 +18,7 @@ const postSchema = mongoose.Schema({
   caption: {
     type: String
   },
-  likes: [{
+  comments: [{
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
@@ -27,7 +27,7 @@ const postSchema = mongoose.Schema({
       type:String
     }
   }],
-  comments: [{
+  likes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],

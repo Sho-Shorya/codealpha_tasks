@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { setProfileData, setUserData } from '../redux/userSlice'
 import { API_BASE_URL } from '../lib/constants'
@@ -8,13 +8,39 @@ import { useEffect } from 'react'
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { HiUserGroup } from "react-icons/hi";
 import { toast } from 'sonner'
+import { FaRegHeart } from "react-icons/fa6"
+import { useLocation, useNavigate } from "react-router-dom";
 import Nav from '../components/Nav'
+import Post from '../components/Post'
 
 function Profile() {
   const navigate = useNavigate()
   const { userName } = useParams()
   const dispatch = useDispatch()
   const { profileData } = useSelector(state => state.user)
+  const { postData } = useSelector(state => state.user)
+
+  // 1. DELETED THE DUPLICATE IMPORT FROM HERE
+  const location = useLocation();
+
+  // Grab the position that Page 1 gave us  
+  const savedScrollPosition = location.state?.savedScrollPosition || 0;
+
+  const handleGoBackToPageOne = () => {
+    // Pass the exact same position back to Page 1 when returning
+    navigate('/', {
+      state: { returnScrollPosition: savedScrollPosition }
+    });
+  };
+
+  // Force Page 2 to ALWAYS show its top content when it mounts
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.overflow-y-auto');
+    if (scrollContainer) {
+      scrollContainer.scrollTo(0, 0);
+    }
+  }, []);
+
   const handleProfile = async () => {
     try {
       const result = await axios.get(`${API_BASE_URL}/api/user/profile/${userName}`, {
@@ -64,12 +90,11 @@ function Profile() {
       <div className='md:w-[25%] flex flex-col items-center'>
         {/* top nav */}
         <div className='w-full flex justify-between items-center   px-[20px] pt-[20px]'>
-          <MdOutlineKeyboardBackspace className='text-white' size={24} onClick={() => navigate('/')} />
+          {/* 2. UPDATED TO USE handleGoBackToPageOne INSTEAD OF navigate('/') */}
+          <MdOutlineKeyboardBackspace className='text-white cursor-pointer' size={24} onClick={handleGoBackToPageOne} />
           <div className='text-white font-semibold'>{profileData?.user?.userName}</div>
           <div className='text-blue-500 cursor-pointer' onClick={handleLogout}>Log Out</div>
         </div>
-
-
 
         {/* profile info */}
         <div className='w-[80px] h-[80px] md:w-[130px] md:h-[130px]  rounded-full overflow-hidden border-2 border-gray-700 mt-[30px]'>
@@ -122,10 +147,18 @@ function Profile() {
         </div>
       </div>
 
-
       {/* posts section */}
-      <div className='md:w-[75%] min-h-screen flex'>
+      <div className='md:w-[50%] min-h-screen flex'>
         <div className='w-full min-h-screen flex justify-center bg-white rounded-t-[60px] md:mt-[0px] sm:mt-[30px] pb-[100px]'>
+          <div className='w-full h-[100px] flex items-center justify-between lg:hidden'>
+            <a href='/'><img className='mt-8 ml-4 cursor-pointer w-[200px]' src='/Chugli_trans3.png' alt='Chugli' /></a>
+            <a href='/'><FaRegHeart className='mt-1 mr-6 text-white h-[25px] w-[25px]' /></a>
+          </div>
+          <div className="w-full min-h-[100vh] flex flex-col items-center gap-[10px] lg:gap-[20px] p-[10px] lg:pt-[40px] pt-[5px] bg-white rounded-t-[30px] relative pb-[120px]">
+            {postData?.map((post, index) => (
+              <Post postData={post} key={index} />
+            ))}
+          </div>
           <Nav />
         </div>
       </div>
