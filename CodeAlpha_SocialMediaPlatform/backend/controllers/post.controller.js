@@ -133,7 +133,7 @@ export const deleteComment = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Comment deleted successfully",
+      message: "Comment deleted.",
       commentUpdatedPost,
     });
   } catch (error) {
@@ -159,18 +159,22 @@ export const deletePost = async (req, res) => {
     }
 
     // Check ownership
-    if (post.author._id.toString() !== req.userId.toString()) {
+    if (post.author?._id.toString() !== req.userId.toString()) {
       return res.status(403).json({
         success: false,
         message: "You are not authorized to delete this post.",
       });
     }
 
+    await User.findByIdAndUpdate(post.author, {
+      $pull: { posts: post._id }
+    });
+
     await Post.findByIdAndDelete(postId);
 
     return res.status(200).json({
       success: true,
-      message: "Post deleted successfully.",
+      message: "Post deleted.",
       postId,
     });
   } catch (error) {
