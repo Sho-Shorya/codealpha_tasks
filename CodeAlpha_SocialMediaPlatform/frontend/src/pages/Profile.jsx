@@ -2,23 +2,29 @@ import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { setProfileData, setUserData } from '../redux/userSlice'
 import { API_BASE_URL } from '../lib/constants'
-import React from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import { useEffect } from 'react'
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
-import { HiUserGroup } from "react-icons/hi";
+import { HiDotsHorizontal, HiUserGroup } from "react-icons/hi";
 import { toast } from 'sonner'
-import { FaRegHeart } from "react-icons/fa6"
+import { FaHandDots, FaRegHeart } from "react-icons/fa6"
 import { useLocation, useNavigate } from "react-router-dom";
 import Nav from '../components/Nav'
 import Post from '../components/Post'
+import FollowBtn from '../components/FollowBtn'
 
 function Profile() {
   const navigate = useNavigate()
   const { userName } = useParams()
   const dispatch = useDispatch()
   const { profileData } = useSelector(state => state.user)
-  const { postData } = useSelector(state => state.user)
+  const { postData } = useSelector((state) => state.posts);
+  const [confirmLogout, setConfirmLogout] = useState(false)
+
+  const userPosts = postData.filter(
+    (post) => post?.author?._id === profileData?.user?._id
+  );
 
   // 1. DELETED THE DUPLICATE IMPORT FROM HERE
   const location = useLocation();
@@ -76,24 +82,22 @@ function Profile() {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
 
-      toast.success("Logged out successfully")
+      toast.success("Logged out!", { duration: 1000 })
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
   }
 
-  const handleFollow = async () => {
-    console.log("followed")
-  }
+
   return (
-    <div className='w-full min-h-[100vh] bg-black md:flex md:flex-row md:items-start relative'>
-      <div className='md:w-[25%] flex flex-col items-center'>
+    <div className='w-full min-h-[100vh] bg-black md:flex md:flex-row md:items-start'>
+      <div className='md:w-[25%]  flex flex-col items-center  '>
         {/* top nav */}
         <div className='w-full flex justify-between items-center   px-[20px] pt-[20px]'>
           {/* 2. UPDATED TO USE handleGoBackToPageOne INSTEAD OF navigate('/') */}
           <MdOutlineKeyboardBackspace className='text-white cursor-pointer' size={24} onClick={handleGoBackToPageOne} />
           <div className='text-white font-semibold'>{profileData?.user?.userName}</div>
-          <div className='text-blue-500 cursor-pointer' onClick={handleLogout}>Log Out</div>
+          {userData._id == profileData?.user?._id ? <div className='text-blue-500 text-[15px] cursor-pointer' onClick={() => { setConfirmLogout(true) }}>Log Out</div> : <div><HiDotsHorizontal className='cursor-pointer' /></div>}
         </div>
 
         {/* profile info */}
@@ -138,30 +142,51 @@ function Profile() {
             Edit Profile
           </button>}
 
-          {profileData?.user?._id != userData?._id && <button
-            className='mt-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'
-            onClick={handleFollow}
-          >
-            Follow
-          </button>}
+          {profileData?.user?._id != userData?._id &&
+
+            <FollowBtn tailwind={'my-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'} targetUserId={profileData?.user?._id} />
+          }
         </div>
       </div>
 
-      {/* posts section */}
-      <div className='md:w-[50%] min-h-screen flex'>
+
+      <div className='md:w-[50%]  min-h-screen flex'>
         <div className='w-full min-h-screen flex justify-center bg-white rounded-t-[60px] md:mt-[0px] sm:mt-[30px] pb-[100px]'>
-          <div className='w-full h-[100px] flex items-center justify-between lg:hidden'>
-            <a href='/'><img className='mt-8 ml-4 cursor-pointer w-[200px]' src='/Chugli_trans3.png' alt='Chugli' /></a>
-            <a href='/'><FaRegHeart className='mt-1 mr-6 text-white h-[25px] w-[25px]' /></a>
-          </div>
-          <div className="w-full min-h-[100vh] flex flex-col items-center gap-[10px] lg:gap-[20px] p-[10px] lg:pt-[40px] pt-[5px] bg-white rounded-t-[30px] relative pb-[120px]">
-            {postData?.map((post, index) => (
-              <Post postData={post} key={index} />
+          <div className=" text-[black] w-full min-h-[100vh] flex flex-col items-center gap-[10px] lg:gap-[20px] p-[20px] lg:pt-[40px] pt-[5px] bg-white rounded-t-[30px] relative pb-[120px]">
+            <p className='text-[black] mt-3 lg:m-0'>
+              {userPosts?.length === 0 ? (
+                "No posts!"
+              ) : userPosts?.length === 1 ? (
+                <>
+                  <span>({userPosts.length})</span> Post
+                </>
+              ) : (
+                <>
+                  <span>({userPosts.length})</span> Posts
+                </>
+              )}
+            </p>
+            {userPosts?.map((post) => (
+              <Post key={post._id} post={post} />
             ))}
           </div>
           <Nav />
         </div>
       </div>
+      {
+        confirmLogout && <div className='fixed inset-0 z-51 flex items-center justify-center bg-black/60'>
+          <div className='text-[black] bg-white rounded-[10px] flex flex-col  justify-center items-center gap-[20px] md:w-[30%]  h-[20%] w-[80%]'>
+            <p className=' text-1.3xl  font-semibold'>Confirm Logout?</p>
+            <div className='flex items-center justify-center  gap-[30px] text-1xl'>
+              <button onClick={() => { setConfirmLogout(false) }} className='bg-gray-200 px-4 py-2 hover:bg-gray-100 cursor-pointer duration-[100ms] rounded-[10px]'>No</button>
+              <button className='hover:bg-red-600 bg-red-600 text-white lg:text-black lg:bg-white hover:text-white cursor-pointer duration-[100ms]  px-4 py-2 rounded-[10px]' onClick={() => {
+                handleLogout();
+                setConfirmLogout(false)
+              }}>Yes</button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   )
 }

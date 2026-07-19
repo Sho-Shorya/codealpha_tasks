@@ -1,17 +1,22 @@
 import axios from 'axios'
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { API_BASE_URL } from '../lib/constants'
 import { toast } from 'sonner'
 import { setUserData } from '../redux/userSlice'
 import OtherUser from './OtherUser'
-import { FaRegHeart } from "react-icons/fa6"
+import { FaRegHeart, FaS } from "react-icons/fa6"
+import { Loader, Loader2 } from 'lucide-react'
 
 const LeftHome = () => {
   const { userData, suggestedUsers } = useSelector(state => state.user)
   const dispatch = useDispatch()
+  const [confirmLogout, setConfirmLogout] = useState(false)
+  const [loading, setLoading] = useState(false)
+
 
   const handleLogout = async () => {
+    setLoading(true);
     try {
 
       await axios.post(
@@ -27,10 +32,11 @@ const LeftHome = () => {
       dispatch(setUserData(null))
       localStorage.removeItem('token')
       localStorage.removeItem('user')
-
-      toast.success("Logged out successfully")
+      toast.success("Logged out!", { duration: 1000 })
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.message, { duration: 1000 });
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -50,19 +56,33 @@ const LeftHome = () => {
             <div className='text-[13px]  text-gray-400'>{userData.name}</div>
           </div>
         </div>
-        <div onClick={handleLogout} className='text-blue-500 font-semibold cursor-pointer'>
+        <div onClick={() => { setConfirmLogout(true) }} className='text-blue-500 font-semibold cursor-pointer'>
           logout
         </div>
       </div>
       <div className='w-full flex flex-col gap-[20px] p-[20px]'>
         <h1 className='text-[15px] ml-1'>Suggested Users</h1>
         <div className=''>
-          {suggestedUsers && suggestedUsers.slice(0, 3).map((user, index) => (
+          {suggestedUsers && suggestedUsers.slice(0, 5).map((user, index) => (
             <OtherUser key={index} user={user} />
           ))}
         </div>
 
       </div>
+      {
+        confirmLogout && <div className='fixed inset-0 z-51 flex items-center justify-center bg-black/60'>
+          <div className='text-[black] bg-white rounded-[10px] flex flex-col  justify-center items-center gap-[20px] md:w-[30%]  h-[20%] w-[80%]'>
+            <p className=' text-1.3xl  font-semibold'>Confirm Logout?</p>
+            <div className='flex items-center justify-center  gap-[30px] text-1xl'>
+              <button onClick={() => { setConfirmLogout(false) }} className='bg-gray-200 px-4 py-2 hover:bg-gray-100 cursor-pointer duration-[100ms] rounded-[10px]'>No</button>
+              <button className='hover:bg-red-600 bg-red-600 text-white lg:text-black lg:bg-white hover:text-white cursor-pointer duration-[100ms]  px-4 py-2 rounded-[10px]' onClick={() => {
+                handleLogout();
+                setConfirmLogout(false)
+              }}>{loading ? <Loader2 className="h-5 p-0 m-0 w-5 animate-spin" /> : "Yes"}</button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   )
 }

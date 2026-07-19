@@ -43,6 +43,7 @@ function App() {
   getCurrentUser();
   getSuggestedUsers();
   useGetAllPosts()
+  
   const { userData } = useSelector(state => state.user)
   return (
     <Routes>

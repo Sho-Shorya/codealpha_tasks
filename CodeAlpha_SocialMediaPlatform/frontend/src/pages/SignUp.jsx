@@ -53,7 +53,7 @@ function SignUp() {
   }
 
   return (
-    <div className="text-[black]  min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-[black]  min-h-screen flex items-center flex-col justify-center bg-gray-50">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 overflow-hidden">
         <div className="p-10">
           <h2 className="text-3xl font-semibold mb-6">Create account</h2>
@@ -68,19 +68,23 @@ function SignUp() {
             </div>
 
             {error && <div className="text-red-600">{error}</div>}
-            <button className="w-full bg-black text-white py-3 rounded-lg font-medium cursor-pointer" value={loading}>
-              {loading ? "Creating..." : "Create account"}
+            <button className="w-full bg-black text-white py-3 rounded-lg flex justify-center font-medium cursor-pointer" value={loading}>
+              {loading ? <Loader2 className="h-6 p-0 m-0 w-6 animate-spin" />: "Create Account"}
             </button>
           </form>
           <p className="mt-4 text-sm text-gray-600">Already have an account? <Link to="/login" className="text-indigo-600">Log in</Link></p>
         </div>
 
-        <div className="sm:  rounded-tl-4xl rounded-bl-4xl flex items-center justify-center bg-gray-900">
-          <div className="text-center px-8">
+        <div className="sm:  rounded-tl-4xl  rounded-bl-4xl flex items-center justify-center bg-gray-900">
+          <div className="text-center px-8 hidden md:block">
             <img src='/Chugli_trans.png' alt="Chugli" className="h-25 text-1xl" />
             <p className="mt-1 text-gray-600">Keep It Unfiltered!</p>
           </div>
         </div>
+      </div>
+      <div className='mt-10 block md:hidden flex flex-col items-center'>
+        <img src='/Chugli_trans.png' alt="Chugli" className="h-15 text-1xl" />
+        <p className='text-[13px] text-gray-500'>Keep in Unfiltered.</p>
       </div>
     </div>
   )

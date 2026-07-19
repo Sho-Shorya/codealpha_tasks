@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ImagePlus, UploadCloud } from "lucide-react";
+import { ArrowLeft, Check, ImagePlus, Loader2, ThumbsUp, ThumbsUpIcon, UploadCloud } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 import { toast } from "sonner";
@@ -48,10 +48,6 @@ function Upload() {
       formData.append('mediaType', mediaType)
       formData.append('media', backendMedia)
 
-      for (const pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
       const token = localStorage.getItem('token')
       const res = await axios.post(`${API_BASE_URL}/api/post/upload`, formData, {
         headers: {
@@ -59,15 +55,14 @@ function Upload() {
         },
       })
       await fetchPosts(dispatch);
-
       navigate('/')
-      toast.success('Media uploaded successfully')
 
     } catch (error) {
       toast.error('Failed to upload media')
       console.log(error);
     } finally {
       setLoading(false)
+      toast.success('Media uploaded', { duration: 1000 })
 
     }
   }
@@ -137,22 +132,25 @@ function Upload() {
         }
 
         {frontendMedia &&
-          <div className='w-[100%] max-w-[500px] h-[250px] flex flex-col
+          <div className='w-[100%] max-w-[500px] h-[350px] flex flex-col
             items-center justify-center '>
             {mediaType == "image" &&
               <div className='w-[100%] max-w-[500px] h-[250px]
-            flex flex-col items-center justify-center  mt-[5vh] '>
+            flex flex-col items-center justify-center  mt-[3vh] '>
                 <img src={frontendMedia} alt="" className='h-[80%] rounded-2xl' />
-                <input type='text' maxLength={150} onChange={(e) => setCaption(e.target.value)} value={caption} className='w-full ■border-b-gray-400 border-b-2
-            outline-none px-[10px] py-[5px] ■text-white mt-[20px]'
-                  placeholder='write caption' />
+                <p className="p-5"><Check /></p>
+                <div className="flex flex-col lg:flex-row w-full h-full my-[20px] gap-[10px] items-center justify-center">
+                  <label className="text-[15px] lg:w-[200px] rounded-lg bg-gray-800 p-2">Enter caption</label>
+                  <input type='text' maxLength={150} onKeyDown={(e)=>e.key==='Enter' && upload()} onChange={(e) => setCaption(e.target.value)} value={caption} className=' w-full ■border-b-gray-400 border-b-2 outline-none px-[10px] py-[5px] ■text-white '
+                    placeholder='write caption' />
+                </div>
               </div>}
           </div>}
         {frontendMedia &&
-          <button onClick={upload} className="mt-20 px-[10px] w-[50%] max-w-
-           [100px]  py-[5px] h-[50px] text-[black] bg-[white] mt-[50px] cursor-pointer
+          <button onClick={upload} className="flex justify-center items-center px-[10px] w-[50%] max-w-
+           [100px]  py-[5px] h-[50px] text-[black] bg-[white] mt-[20px] lg:mt-[10px] cursor-pointer
           rounded-2xl">
-            {loading ? "Uploading..." : "Upload Post"}
+            {loading ? <Loader2 className='size-7 animate-spin' /> : "Upload Post"}
           </button>
         }
 
