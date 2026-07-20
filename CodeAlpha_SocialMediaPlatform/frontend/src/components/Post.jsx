@@ -9,7 +9,6 @@ import { setProfileData, setSuggestedUsers, setUserData } from '../redux/userSli
 import { setPostData } from '../redux/postSlice'
 import { API_BASE_URL } from '../lib/constants.js'
 import { RiDeleteBin6Line } from "react-icons/ri";
-
 import { IoClose } from "react-icons/io5";
 import { toast } from 'sonner'
 import axios from 'axios'
@@ -182,7 +181,7 @@ const Post = ({ post }) => {
             (id) => id !== postId
           )
         };
-        
+
         const updatedProfile = {
           ...profileData,
           user: {
@@ -254,7 +253,7 @@ const Post = ({ post }) => {
           </div>
           <div className='flex flex-row items-center lg:gap-[15px] gap-[10px]'>
             {post?.author?._id !== userData._id && (
-              <FollowBtn tailwind={'bg-black text-white text-xs font-semibold px-5 py-2 rounded-full hover:bg-gray-800 transition'} targetUserId={post?.author?._id}/>
+              <FollowBtn tailwind={'bg-black text-white text-xs cursor-pointer font-semibold px-5 py-2 rounded-full hover:bg-gray-800 transition'} targetUserId={post?.author?._id} />
             )}
             <Ellipsis
               className="cursor-pointer"
@@ -286,9 +285,12 @@ const Post = ({ post }) => {
 
         {/* Caption Section */}
         <div className="text-sm p-2 pt-0">
-          <span className="font-semibold text-gray-900 mr-2">{post?.author?.userName}</span>
-          <span className="text-gray-600">
-            {true
+          <span className="font-semibold text-gray-900 mr-2">
+            {post?.author?.userName}
+          </span>
+
+          <span className="text-gray-600 break-words">
+            {expanded
               ? post?.caption
               : post?.caption.slice(0, 40)}
 
@@ -297,12 +299,11 @@ const Post = ({ post }) => {
                 onClick={() => setExpanded(!expanded)}
                 className="text-gray-400 cursor-pointer ml-1"
               >
-                {expanded ? "Show less" : "...more"}
+                {expanded ? " Show less" : "...more"}
               </span>
             )}
           </span>
         </div>
-
         {showComment && (
           <div>
             <div className="w-full flex items-center gap-3 px-3 py-2 border-t border-gray-200 bg-white">
@@ -391,6 +392,7 @@ const Post = ({ post }) => {
               <>
                 {/* Edit */}
                 <button
+                  onClick={() => navigate(`/editpost/${post._id}`)}
                   className="w-full px-5 py-4 flex items-center gap-3 hover:bg-gray-100 cursor-pointer transition"
                 >
                   <Pencil className='h-5 w-5' />

@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useEffect } from 'react'
 import { API_BASE_URL } from '../lib/constants'
 import { useDispatch } from 'react-redux'
-import { setUserData } from '../redux/userSlice'
+import {  setUserData } from '../redux/userSlice'
 
 const getCurrentUser = () => {
   const dispatch = useDispatch()

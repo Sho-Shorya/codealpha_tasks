@@ -184,3 +184,46 @@ export const deletePost = async (req, res) => {
     });
   }
 };
+
+export const editPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { caption } = req.body;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    if (post.author.toString() !== req.userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    post.caption = caption;
+
+    if (req.file) {
+      const media = await uploadToCloudinary(req.file.path);
+      post.media = media;
+    }
+
+    await post.save();
+
+    res.json({
+      success: true,
+      post,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};

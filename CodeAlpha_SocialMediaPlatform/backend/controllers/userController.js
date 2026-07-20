@@ -174,7 +174,7 @@ export const getProfile = async (req, res) => {
   try {
     const userName = req.params.userName
     // extracting user ID from request params (supports both :userId and :id)
-    const user = await User.findOne({ userName }).select("-password")
+    const user = await User.findOne({ userName }).select("-password").populate("posts followers following")
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -192,6 +192,29 @@ export const getProfile = async (req, res) => {
     })
   }
 }
+
+export const searchUsers = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    const users = await User.find({
+      userName: {
+        $regex: query,
+        $options: "i",
+      },
+    }).select("-password");
+
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 export const editProfile = async (req, res) => {
   try {

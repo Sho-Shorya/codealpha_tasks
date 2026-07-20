@@ -141,14 +141,14 @@ function Upload() {
                 <p className="p-5"><Check /></p>
                 <div className="flex flex-col lg:flex-row w-full h-full my-[20px] gap-[10px] items-center justify-center">
                   <label className="text-[15px] lg:w-[200px] rounded-lg bg-gray-800 p-2">Enter caption</label>
-                  <input type='text' maxLength={150} onKeyDown={(e)=>e.key==='Enter' && upload()} onChange={(e) => setCaption(e.target.value)} value={caption} className=' w-full ■border-b-gray-400 border-b-2 outline-none px-[10px] py-[5px] ■text-white '
+                  <textarea maxLength={150} onChange={(e) => setCaption(e.target.value)} value={caption} className=' w-full ■border-b-gray-400 border-b-2 outline-none px-[10px] py-[5px] ■text-white '
                     placeholder='write caption' />
                 </div>
               </div>}
           </div>}
         {frontendMedia &&
           <button onClick={upload} className="flex justify-center items-center px-[10px] w-[50%] max-w-
-           [100px]  py-[5px] h-[50px] text-[black] bg-[white] mt-[20px] lg:mt-[10px] cursor-pointer
+           [100px]  py-[5px] h-[50px] text-[black] bg-[white] mt-[30px] lg:mt-[10px] cursor-pointer
           rounded-2xl">
             {loading ? <Loader2 className='size-7 animate-spin' /> : "Upload Post"}
           </button>

@@ -64,7 +64,7 @@ const LeftHome = () => {
         <h1 className='text-[15px] ml-1'>Suggested Users</h1>
         <div className=''>
           {suggestedUsers && suggestedUsers.slice(0, 5).map((user, index) => (
-            <OtherUser key={index} user={user} />
+            <OtherUser key={index} user={user} tailwind={'my-1 flex items-center justify-between border-b-2 border-b-gray-900 py-2'} />
           ))}
         </div>
 

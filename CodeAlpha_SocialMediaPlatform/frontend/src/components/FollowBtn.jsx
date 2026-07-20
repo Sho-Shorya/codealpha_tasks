@@ -3,14 +3,14 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'sonner'
 import { API_BASE_URL } from '../lib/constants'
-import { toggleFollow } from '../redux/userSlice'
-import { setProfileData } from "../redux/userSlice";
+import { setProfileData, setUserData } from "../redux/userSlice";
 
-const FollowBtn = ({ targetUserId, tailwind }) => {
-  const { following, profileData, userData } = useSelector(
+const FollowBtn = ({ targetUserId, tailwind, onFollowChange }) => {
+  const { profileData, userData } = useSelector(
     (state) => state.user
   );
-  const isFollowing = following.includes(targetUserId)
+
+  const isFollowing = userData?.following?.includes(targetUserId);
   const dispatch = useDispatch()
   const handleFollow = async () => {
 
@@ -21,16 +21,17 @@ const FollowBtn = ({ targetUserId, tailwind }) => {
           Authorization: `Bearer ${token}`
         }
       })
-      dispatch(toggleFollow(targetUserId))
-      dispatch(setProfileData({
-        ...profileData,
-        user: {
-          ...profileData.user,
-          followers: isFollowing
-            ? profileData.user.followers.filter(id => id !== userData._id)
-            : [...profileData.user.followers, userData._id]
-        }
-      }));
+      if (onFollowChange) {
+        onFollowChange()
+      }
+      const updatedUser = {
+        ...userData,
+        following: isFollowing
+          ? userData.following.filter(id => id !== targetUserId)
+          : [...userData.following, targetUserId]
+      };
+
+      dispatch(setUserData(updatedUser));
     } catch (error) {
       console.log(error);
 

@@ -13,7 +13,7 @@ const Nav = () => {
 
       <div onClick={() => navigate('/')} className='cursor-pointer hover:bg-gray-800 rounded-full p-4'><GoHomeFill className='text-white w-[25px] h-[25px] cursor-pointer' /></div>
 
-      <div className='cursor-pointer hover:bg-gray-800 rounded-full p-4'><FiSearch className='text-white w-[25px] h-[25px] cursor-pointer' /></div>
+      <div onClick={()=>navigate('/search-user')} className='cursor-pointer hover:bg-gray-800 rounded-full p-4'><FiSearch className='text-white w-[25px] h-[25px] cursor-pointer' /></div>
 
       <div onClick={() => navigate('/upload')} className='cursor-pointer hover:bg-gray-800 rounded-full p-4' ><FiPlusSquare className='text-white w-[25px] h-[25px] cursor-pointer ' /></div>
       

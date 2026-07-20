@@ -10,6 +10,8 @@ import Upload from './pages/Upload.jsx'
 import useGetAllPosts, { fetchPosts } from "./hooks/getAllPost";
 import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from "react-redux";
+import SearchUser from './components/SearchUser.jsx'
+import EditPost from './pages/EditPost.jsx'
 function App() {
   const dispatch = useDispatch();
 
@@ -43,7 +45,7 @@ function App() {
   getCurrentUser();
   getSuggestedUsers();
   useGetAllPosts()
-  
+
   const { userData } = useSelector(state => state.user)
   return (
     <Routes>
@@ -51,8 +53,10 @@ function App() {
       <Route path='/login' element={!userData ? <Login /> : <Navigate to={'/'} />} />
       <Route path='/' element={userData ? <Home /> : <Navigate to={'/login'} />} />
       <Route path='/profile/:userName' element={userData ? <Profile /> : <Navigate to={'/login'} />} />
+      <Route path='/search-user' element={userData ? <SearchUser /> : <Navigate to={'/login'} />} />
       <Route path='/editprofile' element={userData ? <EditProfile /> : <Navigate to={'/login'} />} />
       <Route path='/upload' element={userData ? <Upload /> : <Navigate to={'/login'} />} />
+      <Route path="/editpost/:postId" element={userData ? <EditPost /> : <Navigate to="/login" />} />
     </Routes>
   )
 }

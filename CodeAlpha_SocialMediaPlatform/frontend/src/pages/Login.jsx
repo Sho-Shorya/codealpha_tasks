@@ -32,7 +32,7 @@ function Login() {
       if (res.data.success) {
         navigate('/')
         dispatch(setUserData(res.data.user))
-
+        dispatch(setFollowing(res.data.user?.following));
         localStorage.setItem('user', JSON.stringify(res.data.user))
         localStorage.setItem("token", res.data.token)
 

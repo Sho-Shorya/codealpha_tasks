@@ -13,6 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Nav from '../components/Nav'
 import Post from '../components/Post'
 import FollowBtn from '../components/FollowBtn'
+import { Loader } from 'lucide-react'
 
 function Profile() {
   const navigate = useNavigate()
@@ -21,6 +22,7 @@ function Profile() {
   const { profileData } = useSelector(state => state.user)
   const { postData } = useSelector((state) => state.posts);
   const [confirmLogout, setConfirmLogout] = useState(false)
+  const [loadingProfile,setLoadingProfile] = useState(false)
 
   const userPosts = postData.filter(
     (post) => post?.author?._id === profileData?.user?._id
@@ -48,6 +50,7 @@ function Profile() {
   }, []);
 
   const handleProfile = async () => {
+    setLoadingProfile(true)
     try {
       const result = await axios.get(`${API_BASE_URL}/api/user/profile/${userName}`, {
         headers: {
@@ -57,12 +60,13 @@ function Profile() {
       dispatch(setProfileData(result.data))
     } catch (error) {
       console.log(error);
+    }finally{
+      setLoadingProfile(false)
     }
   }
   useEffect(() => {
     handleProfile()
   }, [userName, dispatch])
-
   const { userData, suggestedUsers } = useSelector(state => state.user)
 
   const handleLogout = async () => {
@@ -144,7 +148,7 @@ function Profile() {
 
           {profileData?.user?._id != userData?._id &&
 
-            <FollowBtn tailwind={'my-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'} targetUserId={profileData?.user?._id} />
+            <FollowBtn tailwind={'my-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'} targetUserId={profileData?.user?._id} onFollowChange={handleProfile} />
           }
         </div>
       </div>
@@ -187,6 +191,11 @@ function Profile() {
           </div>
         </div>
       }
+      {
+        loadingProfile && <div className='fixed inset-0 z-51 flex items-center justify-center bg-black/30'>
+        </div>
+      }
+
     </div>
   )
 }
