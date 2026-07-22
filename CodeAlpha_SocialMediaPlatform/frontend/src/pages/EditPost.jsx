@@ -6,12 +6,13 @@ import { API_BASE_URL } from "../lib/constants";
 import { toast } from "sonner";
 import { fetchPosts } from "../hooks/getAllPost";
 import { FiEdit } from "react-icons/fi";
-import { Loader2 } from "lucide-react";
+import { ClosedCaption, Cross, Loader2, PanelTopClose, X } from "lucide-react";
+import { MdOutlineKeyboardBackspace, MdWrongLocation } from "react-icons/md";
 
 const EditPost = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const { postData } = useSelector(state => state.posts);
 
   const [caption, setCaption] = useState("");
@@ -65,15 +66,14 @@ const EditPost = () => {
 
     } catch (err) {
       toast.error("Failed");
-    }finally{
+    } finally {
       setLoading(false)
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-black">
-
-      <div className="bg-white text-[black] rounded-xl p-5 w-[400px]">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-black">
+      <div className="bg-white text-[black] rounded-xl p-5 w-[90%] lg:w-[400px]">
 
         <div className="relative w-full h-full rounded-xl overflow-hidden">
 
@@ -85,23 +85,7 @@ const EditPost = () => {
 
           <label
             htmlFor="media"
-            className="
-    absolute
-    top-1/2
-    left-1/2
-    -translate-x-1/2
-    -translate-y-1/2
-    w-16
-    h-16
-    bg-black/80
-    hover:bg-black
-    rounded-full
-    flex
-    items-center
-    justify-center
-    cursor-pointer
-    transition-all
-    duration-200
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-black/80 hover:bg-black rounded-full flex items-center justify-center cursor-pointer transition-all duration-200
   "
           >
             <FiEdit size={28} className="text-white" />
@@ -129,7 +113,10 @@ const EditPost = () => {
         </div>
 
       </div>
+      <div className="p-4 mt-[10px] transition duration-[200ms] rounded-full cursor-pointer hover:bg-red-600 ">
+        <X className=' text-white' size={24} onClick={() => navigate(`/`)} />
 
+      </div>
     </div>
   );
 };

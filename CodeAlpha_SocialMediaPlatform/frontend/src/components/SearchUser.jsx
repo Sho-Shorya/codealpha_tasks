@@ -47,13 +47,13 @@ const SearchUser = () => {
     return () => clearTimeout(timer);
   }, [searchedUser]);
   return (
-    <div className='w-full h-full flex flex-col pt-2 bg-[black] text-white'>
+    <div className='w-full h-auto flex flex-col pt-2 bg-[black] text-white'>
       <div className='w-full h-[30px] flex justify-between items-center   px-[20px] pt-[20px]'>
         <MdOutlineKeyboardBackspace onClick={() => navigate('/')} className='text-white cursor-pointer' size={24} />
         <div className='text-white font-semibold'>Search</div>
         <div><HiDotsHorizontal className='cursor-pointer' /></div>
       </div>
-      <div className="w-full flex justify-center mt-8 pb-[100px]">
+      <div className="w-full flex justify-center mt-8 pb-[200px]">
         <div className="w-full max-w-2xl px-4">
           <input
             value={searchedUser}
@@ -63,7 +63,7 @@ const SearchUser = () => {
             className="w-full h-12 px-5 rounded-xl bg-white text-black outline-none"
           />
 
-          <div className="mt-8">
+          <div className="mt-8 h-screen">
             <h2 className="text-center text-gray-400 text-xl mb-6">
               {searchedUser ? "Results" : "Suggested Users"}
             </h2>
@@ -84,7 +84,7 @@ const SearchUser = () => {
                   ))
                 )}
               {searchedUser && results.length === 0 && (
-                <p className="text-center flex justify-center items-center text-gray-400 m-10">
+                <p className="text-center flex justify-center h- items-center text-gray-400 m-10">
                   No users found
                 </p>
               )}

@@ -15,7 +15,7 @@ export const fetchPosts = async (dispatch) => {
         Authorization: `Bearer ${token}`,
       },
     });
-
+    
     dispatch(setPostData(res.data));
   } catch (error) {
     console.log(error);

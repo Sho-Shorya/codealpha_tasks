@@ -14,6 +14,7 @@ import Nav from '../components/Nav'
 import Post from '../components/Post'
 import FollowBtn from '../components/FollowBtn'
 import { Loader } from 'lucide-react'
+import { setSelectedUser } from '../redux/messageSlice'
 
 function Profile() {
   const navigate = useNavigate()
@@ -22,7 +23,7 @@ function Profile() {
   const { profileData } = useSelector(state => state.user)
   const { postData } = useSelector((state) => state.posts);
   const [confirmLogout, setConfirmLogout] = useState(false)
-  const [loadingProfile,setLoadingProfile] = useState(false)
+  const [loadingProfile, setLoadingProfile] = useState(false)
 
   const userPosts = postData.filter(
     (post) => post?.author?._id === profileData?.user?._id
@@ -60,13 +61,16 @@ function Profile() {
       dispatch(setProfileData(result.data))
     } catch (error) {
       console.log(error);
-    }finally{
+    } finally {
       setLoadingProfile(false)
     }
   }
   useEffect(() => {
+    if (!profileData) {
+      navigate("/", { replace: true });
+    }
     handleProfile()
-  }, [userName, dispatch])
+  }, [navigate, userName, dispatch])
   const { userData, suggestedUsers } = useSelector(state => state.user)
 
   const handleLogout = async () => {
@@ -148,7 +152,10 @@ function Profile() {
 
           {profileData?.user?._id != userData?._id &&
 
-            <FollowBtn tailwind={'my-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'} targetUserId={profileData?.user?._id} onFollowChange={handleProfile} />
+            <div className='flex gap-[15px]'>
+              <FollowBtn tailwind={'my-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'} targetUserId={profileData?.user?._id} onFollowChange={handleProfile} />
+              <button onClick={() => { dispatch(setSelectedUser(profileData?.user)); navigate('/message-area') }} className='my-[20px] px-[24px] py-[8px] bg-white text-[black] rounded-full font-medium cursor-pointer'>Message</button>
+            </div>
           }
         </div>
       </div>

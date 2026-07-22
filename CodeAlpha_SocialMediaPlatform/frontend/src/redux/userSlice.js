@@ -6,8 +6,7 @@ const userSlice = createSlice({
   initialState: {
     userData: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null,
     suggestedUsers: null,
-    profileData:null,
-    following:[]
+    profileData: null
   },
   reducers: {
     setUserData: (state, action) => {
@@ -18,9 +17,11 @@ const userSlice = createSlice({
     },
     setProfileData: (state, action) => {
       state.profileData = action.payload
+    }, clearUser: (state) => {
+      state.userData = null;
     },
   }
 })
 
-export const { setUserData, setSuggestedUsers, setProfileData } = userSlice.actions
+export const { setUserData, setSuggestedUsers, setProfileData ,clearUser} = userSlice.actions
 export default userSlice.reducer

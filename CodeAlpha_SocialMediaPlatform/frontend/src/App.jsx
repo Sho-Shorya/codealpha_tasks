@@ -12,6 +12,9 @@ import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import SearchUser from './components/SearchUser.jsx'
 import EditPost from './pages/EditPost.jsx'
+import Messages from './pages/Messages.jsx'
+import RightHome from './components/RightHome.jsx'
+import MessageArea from './pages/MessageArea.jsx'
 function App() {
   const dispatch = useDispatch();
 
@@ -52,6 +55,8 @@ function App() {
       <Route path='/register' element={!userData ? <SignUp /> : <Navigate to={'/'} />} />
       <Route path='/login' element={!userData ? <Login /> : <Navigate to={'/'} />} />
       <Route path='/' element={userData ? <Home /> : <Navigate to={'/login'} />} />
+      <Route path='/messages' element={userData ? <Messages /> : <Navigate to={'/login'} />} />
+      <Route path='/message-area' element={userData ? <MessageArea /> : <Navigate to={'/login'} />} />
       <Route path='/profile/:userName' element={userData ? <Profile /> : <Navigate to={'/login'} />} />
       <Route path='/search-user' element={userData ? <SearchUser /> : <Navigate to={'/login'} />} />
       <Route path='/editprofile' element={userData ? <EditProfile /> : <Navigate to={'/login'} />} />
