@@ -7,6 +7,7 @@ import { setPrevChatUsers } from "../redux/messageSlice";
 
 const getPrevChatUsers = () => {
   const { messages } = useSelector(state => state.message)
+  const { userData } = useSelector(state => state.user)
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -34,7 +35,7 @@ const getPrevChatUsers = () => {
     };
 
     fetchUser();
-  }, [messages]);
+  }, [messages,userData]);
 };
 
 export default getPrevChatUsers;

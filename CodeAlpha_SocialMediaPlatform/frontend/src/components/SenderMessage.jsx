@@ -6,9 +6,10 @@ function SenderMessage({ message }) {
   const { messages } = useSelector(state => state.message)
   const scroll = useRef()
   useEffect(() => {
-    scroll.current.scrollIntoView({ behavior: "smooth" })
-  }, [messages.message,messages.image])
-
+    scroll.current?.scrollIntoView({
+      behavior: "smooth"
+    });
+  }, [messages]);
   return (
     <div ref={scroll} className='w-fit max-w-[60%] bg-gradient-to-br from-[#9500ff] to-[#ff0095] rounded-t-2xl rounded-bl-2xl rounded-br-0 px-[10px] py-[10px] relative ml-auto right-0 flex flex-col gap-[10px]'>
 

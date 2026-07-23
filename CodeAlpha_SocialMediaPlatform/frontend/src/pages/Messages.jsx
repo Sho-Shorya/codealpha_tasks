@@ -26,7 +26,7 @@ const Messages = () => {
       </div>
 
       <div className='w-full h-[100px] flex flex-col gap-[10px] items-start  items-center overflow-x-auto border-b-2 mb-3 border-gray-800'>
-        <p> ({onlineUsers?.length <= 0 ? "No active users" : <p>Active Users ({onlineUsers?.length})</p>})</p>
+        <div> {onlineUsers?.length == 1 ? "No active users" : <p>Active Users ({onlineUsers?.length-1})</p>}</div>
         <div className='w-full h-[80px] flex gap-[15px]'>
           {userData?.following?.map(user =>
             onlineUsers?.includes(user._id) &&

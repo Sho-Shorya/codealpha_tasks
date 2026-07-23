@@ -86,12 +86,14 @@ const MessageArea = () => {
 
   }, [selectedUser, navigate]);
 
-  useEffect(()=>{
-    socket?.on("newMessage",(mess)=>{
-      dispatch(setMessages(...messages,mess))
+  useEffect(() => {
+    socket?.on("newMessage", (mess) => {
+      dispatch(setMessages([...messages, mess]));
     })
-    return ()=>socket.off('newMessage')
-  },[messages,setMessages])
+    return () => {
+      socket?.off("newMessage");
+    }
+  }, [socket, messages, dispatch])
 
   return (
     <div className="w-full h-screen bg-[black] relative">
@@ -134,7 +136,7 @@ const MessageArea = () => {
           <div className='w-full lg:w-[50%] h-[90%] pt-[100px] pb-[140px]  lg:pb-[140px] px-[40px] flex flex-col gap-[50px] overflow-auto bg-black'>
             {messages &&
               messages.map((mess, index) =>
-                mess.sender == userData._id ? (
+                mess.sender?.toString() === userData._id ? (
                   <SenderMessage key={index} message={mess} />
                 ) : (
                   <ReceiverMessage key={index} message={mess} />
