@@ -15,10 +15,42 @@ import EditPost from './pages/EditPost.jsx'
 import Messages from './pages/Messages.jsx'
 import RightHome from './components/RightHome.jsx'
 import MessageArea from './pages/MessageArea.jsx'
+import { io } from 'socket.io-client'
+import { setOnlineUsers, setSocket } from './redux/socketSlice.js'
+import { API_BASE_URL } from './lib/constants.js'
+import getPrevChatUsers from './hooks/getPrevChatUsers.jsx'
 function App() {
+  const { userData } = useSelector(state => state.user)
+  const { socket } = useSelector(state => state.socket)
   const dispatch = useDispatch();
-
   useGetAllPosts();
+  getCurrentUser();
+  getSuggestedUsers();
+  useGetAllPosts()
+  getPrevChatUsers()
+
+  useEffect(() => {
+    if (userData) {
+      const socketIo = io(API_BASE_URL, {
+        query: {
+          userId: userData._id
+        }
+      })
+      dispatch(setSocket(socketIo))
+      socketIo.on('getOnlineUsers', (users) => {
+        dispatch(setOnlineUsers(users))
+
+      })
+
+      return () => socketIo.close()
+    } else {
+      if (socket) {
+        socket.close()
+        dispatch(setSocket(null))
+      }
+    }
+  }, [userData])
+
 
   // 1. Grab your location path strings
   const { pathname } = useLocation();
@@ -45,11 +77,7 @@ function App() {
     return () => scrollContainer.removeEventListener("scroll", handleScroll);
   }, [pathname]); // Fires cleanly every single time you navigate paths
 
-  getCurrentUser();
-  getSuggestedUsers();
-  useGetAllPosts()
 
-  const { userData } = useSelector(state => state.user)
   return (
     <Routes>
       <Route path='/register' element={!userData ? <SignUp /> : <Navigate to={'/'} />} />

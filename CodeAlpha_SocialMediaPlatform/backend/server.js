@@ -8,11 +8,11 @@ import { authRouter } from "./routes/auth.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { postRouter } from "./routes/post.routes.js";
 import { messageRouter } from "./routes/message.routes.js";
+import { app, server } from "./socket.js";
 
 //mongoDB error fix 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
-const app = express();
 const PORT = process.env.PORT || 5000;
 
 
@@ -29,7 +29,7 @@ app.use('/api/post',postRouter)
 app.use('/api/message',messageRouter)
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   connectDb()
   console.log("Server started successfully");
   console.log(`Server running on port ${PORT}`);

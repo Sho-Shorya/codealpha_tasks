@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Heart, MessageCircle, Bookmark, VolumeX, Pencil, Trash2, Copy } from 'lucide-react';
 import { Ellipsis } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +27,7 @@ const Post = ({ post }) => {
   const dispatch = useDispatch()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const { suggestedUser } = useSelector(state => state.user)
+  const { socket } = useSelector(state => state.socket)
 
 
   const handleLike = async () => {
@@ -233,6 +234,35 @@ const Post = ({ post }) => {
     // navigate(`/profile/${userData.userName}`)
   }
 
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("socketLikedPost", (updatedData) => {
+      const socketUpdatedPosts = postData.map((p) =>
+        p._id === updatedData.postId
+          ? { ...p, likes: updatedData.likes }
+          : p
+      );
+
+      dispatch(setPostData(socketUpdatedPosts));
+    });
+
+    socket.on("socketCommentedPost", (updatedData) => {
+      const socketUpdatedPosts = postData.map((p) =>
+        p._id === updatedData.postId
+          ? { ...p, comments: updatedData.comments }
+          : p
+      );
+
+      dispatch(setPostData(socketUpdatedPosts));
+    });
+
+    return () => {
+      socket.off("socketLikedPost");
+      socket.off("socketCommentedPost");
+    };
+  }, [socket, postData, dispatch]);
+  
   return (
     <div className="w-[100%] lg:w-[70%] min-h-[300px] flex flex-col gap-[10px] bg-white items-center shadow-1xl shadow-[#00000058] rounded-2xl">
       {/* Outer Card Container */}

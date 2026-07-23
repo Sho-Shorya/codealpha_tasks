@@ -64,9 +64,12 @@ export const like = async (req, res) => {
     } else {
       selectedPost.likes.push(req.userId)
     }
-
     await selectedPost.save()
     await selectedPost.populate("author", "name userName profilePic")
+    io.emit('SocketLikedPost', {
+      postId: selectedPost._id,
+      like: selectedPost.likes
+    })
     return res.status(200).json(selectedPost)
   } catch (error) {
     return res.status(500).json({ message: `like post error ${error}` })
@@ -88,6 +91,11 @@ export const comment = async (req, res) => {
     await commentedPost.save()
     await commentedPost.populate("author", "name userName profilePic");
     await commentedPost.populate("comments.author", "name userName profilePic");
+    io.emit('socketCommentedPost', {
+      postId: commentedPost._id,
+      comments: commentedPost.comments
+    })
+
     return res.status(200).json(commentedPost)
 
   } catch (error) {

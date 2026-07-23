@@ -7,5 +7,5 @@ export const messageRouter = express.Router();
 
 messageRouter.post('/send/:receiverId',isAuthenticated, Upload.single("image"), sendMessage) 
 messageRouter.get('/getallmess/:receiverId',isAuthenticated, getAllMessages)
-messageRouter.delete('/prevChats',isAuthenticated, getPrevUserChats ) 
+messageRouter.get('/prev-chats',isAuthenticated, getPrevUserChats ) 
  
