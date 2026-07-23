@@ -1,6 +1,7 @@
 import uploadToCloudinary from "../config/cloudinary.js";
 import { Post } from "../models/postModel.js";
 import { User } from "../models/userModel.js";
+import { io } from "../socket.js";
 
 export const uploadPost = async (req, res) => {
   try {
@@ -66,7 +67,7 @@ export const like = async (req, res) => {
     }
     await selectedPost.save()
     await selectedPost.populate("author", "name userName profilePic")
-    io.emit('SocketLikedPost', {
+    io.emit('socketLikedPost', {
       postId: selectedPost._id,
       like: selectedPost.likes
     })
@@ -179,7 +180,10 @@ export const deletePost = async (req, res) => {
     });
 
     await Post.findByIdAndDelete(postId);
-
+    io.emit("socketCommentedPost", {
+      postId: commentUpdatedPost._id,
+      comments: commentUpdatedPost.comments
+    });
     return res.status(200).json({
       success: true,
       message: "Post deleted.",

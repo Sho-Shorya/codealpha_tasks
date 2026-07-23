@@ -23,13 +23,14 @@ const postSchema = mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     },
-    message:{
-      type:String
+    message: {
+      type: String
     }
   }],
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    default: []
   }],
 }, { timestamps: true })
 

@@ -2,6 +2,7 @@ import uploadToCloudinary from "../config/cloudinary.js";
 import Conversation from "../models/conversationModel.js";
 import Message from "../models/messageModel.js";
 import { getSocketId } from "../socket.js";
+import { io } from "../socket.js";
 
 export const sendMessage = async (req, res) => {
   try {
