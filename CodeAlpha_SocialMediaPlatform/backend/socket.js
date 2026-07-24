@@ -8,9 +8,9 @@ const server = http.createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: "https://chugli-iota.vercel.app/", // Replace with your frontend URL
+    // origin: "https://chugli-iota.vercel.app", // Replace with your frontend URL
     // origin: "http://localhost:5173", // Replace with your frontend URL
-    methods: ["GET", "POST", "DELETE", "PUT"]
+    methods: ["GET", "POST"]
   }
 });
 

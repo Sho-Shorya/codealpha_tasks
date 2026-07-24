@@ -41,7 +41,7 @@ const Post = ({ post }) => {
         ...p,
         likes: alreadyLiked
           ? p?.likes.filter((id) => id !== userData._id)
-          : [...p.likes||[], userData._id],
+          : [...p.likes || [], userData._id],
       };
     });
 
@@ -205,13 +205,11 @@ const Post = ({ post }) => {
     try {
       const postId = post?._id;
 
-      // Safety check to ensure the ID exists before attempting to copy
       if (!postId) {
         toast.error('Post ID not found.');
         return;
       }
 
-      // Directly build the string instead of mapping through an array
       const postLinkToCopy = `Abhi ye nahin bnaya yaar`;
 
       await navigator.clipboard.writeText(postLinkToCopy);
